@@ -1,0 +1,71 @@
+---
+title: "Cycling to School: Increasing Secondary School Enrollment for Girls in India"
+subtitle: | 
+  | by Muralidharan and Prakash (2017)
+  | Replication walkthrough
+author: "Sean Hambali"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+output: 
+  xaringan::moon_reader:
+    css: [default, default-fonts]
+---
+
+class: left, middle
+
+<i><p style = "font-size: 30px">I think the bicycle <br> 
+has done more <br> 
+to emancipate women <br> 
+than anything else in <br>
+the world.</i></p>
+
+Susan B. Anthony<br>
+(19th-century leader of <br>US women's suffrage movement)
+
+<img src="https://files.globalgiving.org/pfil/1963/ph_1963_6312.jpg?m=1259920930000" width="475px" style="position:absolute; right:0px; top:0px;" />
+---
+# Paper Motivation 
+
+---
+# Brief Program Description 
+
+---
+# Methods: Data
+
+--- 
+# Methods: Identification Strategy
+
+
+---
+# Methods: Estimating Equations
+
+---
+# Results: Enrollment Impacts
+
+
+---
+# Results: Heterogeneity of Enrollment Impact 
+
+
+---
+# Results: Impacts on Learning Outcomes 
+
+
+---
+# Robustness Checks: Alternative 'Treated' and 'Controls'
+
+
+---
+# Robustness Checks: Omitted Variables
+
+
+--- 
+# Robustness Checks: Border Districts and Clustering 
+
+
+
+--- 
+# Robustness Checks: Spillovers?
+
+
+---
+# Discussion and Conclusion

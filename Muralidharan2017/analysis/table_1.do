@@ -2,18 +2,19 @@
 /* Cycling to School Replication Files for AEJ: Applied by Muralidharan and Prakash */
 /* Table 1: Testing the Parallel Trends Assumption */
 
-clear
-if "`c(username)' == wb564190" {
-	cd "C:\Users\wb564190\OneDrive - WBG\Documents\Indo_Econ_Workshop\Muralidharan2017\113676-V1\APP2016-0004_data"	
-}
+* removing prior work environment
+clear all
+clear mata 
+clear matrix 
+set more off 
 
+* setting up the global
 if "`c(username)'" == "Sean Hambali" {
-	cd "C:\Users\Sean Hambali\Documents\GitHub\wb_isa_workshop\Muralidharan2017\replication_data\APP2016-0004_data"
+	gl github_data "C:/Users/Sean Hambali/Documents/GitHub/wb_isa_workshop/Muralidharan2017/replication_data/APP2016-0004_data"
+	gl local_data "C:/Users/Sean Hambali/Desktop/DATA/Muralidharan2017"
 }
 
-set more off
-
-use "bh_enroll_data_reg.dta", clear
+use "$local_data/bh_enroll_data_reg.dta", clear
 
 * Converting enrollment in logs as the population base for Bihar and Jharkhand is different *
 gen lenrollment = log(enrollment)
