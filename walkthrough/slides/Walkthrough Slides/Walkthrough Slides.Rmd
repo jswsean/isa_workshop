@@ -137,22 +137,54 @@ led to **increases in provision of key public goods**:
 
 <img src="indo_students.jpg" style="position:absolute; right:0; top:500px;">
 
-* Data: Village Potentials (*Potensi Desa*)
+* Data: Village Potentials (*Potensi Desa*), merged with INPRES school data
 --
 
     
     + Between 1986 - 2003
 
---
     + Java island only: 9,855 villages (excluding *kelurahan*), 
     4 provinces, 82 districts
 
 --
 
-* Full paper dataset can be downloaded here. 
+* Full paper dataset can be downloaded <span style="text-decoration:underline">[here](https://github.com/jswsean/isa_workshop/tree/main/walkthrough/113664-V1/AEJApp-2015-0447_Dataset)</span>. 
 
 ---
-# Methods 
+# Methods: key institutional feature
+
+<img src="indo_students.jpg" style="position:absolute; right:0; top:500px;">
+
+* First cohort 'treated' by INPRES schools: 7 YOs in 1974
+
+--
+
+    + First INPRES cohort will be eligible to run for office by 1992 (25 Y.O.)
+
+--
+
+* Villages run elections every 8 years 
+
+--
+
+* Election timing varies across villages
+
+--
+
+* Year of first election post-1992 captures the timing at which INPRES cohorts could start running for office.
+
+---
+# Methods: key institutional feature
+
+<img src = 'event_timeline.jpg'>
+<figcaption><i>Source: Martinez-Bravo (2017)</i></figcaption>
+
+
+---
+# Methods: key institutional feature
+
+<img src = 'event_timeline.jpg'>
+<figcaption><i>Source: Martinez-Bravo (2017)</i></figcaption>
 
 
 ---
