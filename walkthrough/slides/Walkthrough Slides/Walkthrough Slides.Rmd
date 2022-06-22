@@ -1,0 +1,170 @@
+---
+title: "The Local Political Economy Effects of School Construction in Indonesia"
+subtitle: 'Walkthrough Presentation'
+author: "Originally by Martinez-Bravo (2017)"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+output: 
+  xaringan::moon_reader:
+    css: ['default', 'default-fonts', 'custom.css', 'xaringan-themer.css']
+    lib_dir: libs 
+    nature: 
+      countIncrementalSlides: false
+
+---
+
+```{r xaringan-themer, echo=FALSE, include=FALSE, warning=FALSE}
+library(xaringanthemer)
+style_mono_light(
+  base_color = "#23395b",
+  header_font_google = google_font("Josefin Sans"),
+  text_font_google   = google_font("Montserrat", "400", "500i"),
+  code_font_google   = google_font("Fira Mono")
+)
+```
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      message = FALSE,
+                      warning = FALSE)
+```
+
+
+# What motivated the paper?
+
+* There have been massive increases in school enrollment and educational attainment 
+among developing countries in the last decades
+
+<img src="indo_students.jpg" style="position:absolute; right:0; top:500px;">
+
+--
+
+* How would this affect local governance?
+
+--
+
+* Martinez-Bravo (MB, 2017) looks at **the impact of large school construction program** 
+in Indonesia (the INPRES program) on **village governance and public good provisions**.
+
+---
+# The author's hypothesis
+
+```{r theory_of_change}
+DiagrammeR::grViz(" digraph {
+
+                  graph [layout = dot, rankdir = LR]
+  
+                  # node definitions with substituted label text
+                  node [shape = rectangle, fontsize = 7, fontname = 'Montserrat']
+                  input [label = 'INPRES school \nconstruction \nprogram']
+                  output [label = 'Increased education \nof village head \ncandidates']
+                  outcome1 [label = 'Better reallocation \nof village \nbudgets']
+                  outcome2 [label = 'Efficient project \nmanagement']
+                  impact [label = 'Better \nprovision of \npublic goods']
+                  
+                  # defining the edge
+                  input -> output -> outcome1 -> impact
+                  output -> outcome2 -> impact
+                  }",
+                  height = 500, width = 800)
+```
+
+---
+
+# How the author does it 
+
+* **Key institutional feature**: 
+
+    + INPRES program started in 1974
+    <img src="indo_students.jpg" style="position:absolute; right:0; top:550px;">
+--
+    + Village head candidates must be at least 25 years old
+--
+
+* **Treatment**: Village-elections in which newly educated cohorts (the INPRES cohorts) 
+could run as village head candidates
+
+--
+
+* **Outcome**: Village-level public good provisions
+
+--
+
+* MB used DiD strategy to compare village-level outcomes among:
+  
+--
+  
+    + Villages before and after the INPRES cohorts could run as candidates 
+--
+    + Villages that had run their first INPRES cohort elections and those that had not
+    
+---
+# What's the result?
+
+* First election to which the newly educated cohorts could run as candidates 
+led to **increases in provision of key public goods**:
+
+--
+
+    + Number of doctors
+--
+    + Presence of primary health care centers
+--
+    + Access to basic services, i.e., safe drinking water and garbage disposal
+--
+
+* Effects are **stronger** for villages where the INPRES program was more intense. 
+
+--
+
+* Effects are heterogenous across villages as a function of villagers' 
+**demand for public goods**.
+
+--
+
+* Validating the hypothesized causal pathways:
+
+--
+    
+    + **First-stage**: INPRES school constructions induced increased in the education of village head 
+    that is ultimately elected 
+--
+    + **Second-stage**: More educated village heads better reallocate their budgets 
+--
+    + **Second-stage**: More educated village heads manage their projects better. 
+
+---
+# Data
+
+<img src="indo_students.jpg" style="position:absolute; right:0; top:500px;">
+
+* Data: Village Potentials (*Potensi Desa*)
+--
+
+    
+    + Between 1986 - 2003
+
+--
+    + Java island only: 9,855 villages (excluding *kelurahan*), 
+    4 provinces, 82 districts
+
+--
+
+* Full paper dataset can be downloaded here. 
+
+---
+# Methods 
+
+
+---
+# Results
+
+
+---
+# Mechanisms 
+
+
+---
+# Discussion and Conclusion
+
+
+

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>The Local Political Economy Effects of School Construction in Indonesia</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Originally by Martinez-Bravo (2017)" />
+    <meta name="date" content="2022-06-22" />
+    <script src="libs/header-attrs-2.14/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+    <script src="libs/viz-1.8.2/viz.js"></script>
+    <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
+    <script src="libs/grViz-binding-1.0.9/grViz.js"></script>
+    <link rel="stylesheet" href="custom.css" type="text/css" />
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# The Local Political Economy Effects of School Construction in Indonesia
+]
+.subtitle[
+## Walkthrough Presentation
+]
+.author[
+### Originally by Martinez-Bravo (2017)
+]
+.date[
+### 22 June 2022
+]
+
+---
+
+
+
+
+
+
+
+# What motivated the paper?
+
+* There have been massive increases in school enrollment and educational attainment 
+among developing countries in the last decades
+
+&lt;img src="indo_students.jpg" style="position:absolute; right:0; top:500px;"&gt;
+
+--
+
+* How would this affect local governance?
+
+--
+
+* Martinez-Bravo (MB, 2017) looks at **the impact of large school construction program** 
+in Indonesia (the INPRES program) on **village governance and public good provisions**.
+
+---
+# The author's hypothesis
+
+<div id="htmlwidget-2e2c6c37391a03e11029" style="width:800px;height:500px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2e2c6c37391a03e11029">{"x":{"diagram":" digraph {\n\n                  graph [layout = dot, rankdir = LR]\n  \n                  # node definitions with substituted label text\n                  node [shape = rectangle, fontsize = 7, fontname = \"Montserrat\"]\n                  input [label = \"INPRES school \nconstruction \nprogram\"]\n                  output [label = \"Increased education \nof village head \ncandidates\"]\n                  outcome1 [label = \"Better reallocation \nof village \nbudgets\"]\n                  outcome2 [label = \"Efficient project \nmanagement\"]\n                  impact [label = \"Better \nprovision of \npublic goods\"]\n                  \n                  # defining the edge\n                  input -> output -> outcome1 -> impact\n                  output -> outcome2 -> impact\n                  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+
+---
+
+# How the author does it 
+
+* **Key institutional feature**: 
+
+    + INPRES program started in 1974
+    &lt;img src="indo_students.jpg" style="position:absolute; right:0; top:550px;"&gt;
+--
+    + Village head candidates must be at least 25 years old
+--
+
+* **Treatment**: Village-elections in which newly educated cohorts (the INPRES cohorts) 
+could run as village head candidates
+
+--
+
+* **Outcome**: Village-level public good provisions
+
+--
+
+* MB used DiD strategy to compare village-level outcomes among:
+  
+--
+  
+    + Villages before and after the INPRES cohorts could run as candidates 
+--
+    + Villages that had run their first INPRES cohort elections and those that had not
+    
+---
+# What's the result?
+
+* First election to which the newly educated cohorts could run as candidates 
+led to **increases in provision of key public goods**:
+
+--
+
+    + Number of doctors
+--
+    + Presence of primary health care centers
+--
+    + Access to basic services, i.e., safe drinking water and garbage disposal
+--
+
+* Effects are **stronger** for villages where the INPRES program was more intense. 
+
+--
+
+* Effects are heterogenous across villages as a function of villagers' 
+**demand for public goods**.
+
+--
+
+* Validating the hypothesized causal pathways:
+
+--
+    
+    + **First-stage**: INPRES school constructions induced increased in the education of village head 
+    that is ultimately elected 
+--
+    + **Second-stage**: More educated village heads better reallocate their budgets 
+--
+    + **Second-stage**: More educated village heads manage their projects better. 
+
+---
+# Data
+
+&lt;img src="indo_students.jpg" style="position:absolute; right:0; top:500px;"&gt;
+
+* Data: Village Potentials (*Potensi Desa*)
+--
+
+    
+    + Between 1986 - 2003
+
+--
+    + Java island only: 9,855 villages (excluding *kelurahan*), 
+    4 provinces, 82 districts
+
+
+---
+# Methods 
+
+
+---
+# Results
+
+
+---
+# Mechanisms 
+
+
+---
+# Discussion and Conclusion
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
