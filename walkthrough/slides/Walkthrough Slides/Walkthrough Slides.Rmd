@@ -22,10 +22,28 @@ style_mono_light(
 )
 ```
 
+```{r xaringan-panelset, echo = FALSE}
+xaringanExtra::use_panelset()
+```
+
+```{css, echo = FALSE}
+
+.remark-code {
+  font-size: 12px;
+}
+.huge .remark-code { /*Change made here*/
+  font-size: 200% !important;
+}
+.tiny .remark-code { /*Change made here*/
+  font-size: 50% !important;
+}
+```
+
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = FALSE, 
                       message = FALSE,
                       warning = FALSE)
+library(Statamarkdown)
 ```
 
 
@@ -183,7 +201,7 @@ led to **increases in provision of key public goods**:
 ---
 # Methods: key institutional feature
 
-* Does the timing of increase in public good provision should correspond to the 
+* Does the timing of increase in public good provision correspond to the 
 timing of first post-1992 election? 
 
   $$y_{vt} = \beta_0 + \sum^{2003}_{s=1990} (\delta_s \times Num\_{INPRES}_{v}) \gamma_{s} + \alpha_v + \delta_t +      \epsilon_{vt}$$
@@ -205,6 +223,63 @@ timing of first post-1992 election?
     + 1992-1993 election group
     + 1994-1996 
     + 1997-2000
+    
+    
+---
+# Methods: key institutional feature 
+
+.panelset[
+.panel[.panel-name[Stata Code]
+
+```{stata figure1_code, results="hide", echo = TRUE}
+
+use "$raw_data/VHeduc_Data", clear
+
+// we set up the data as panel 
+xtset v_id year
+
+// first, we generate the election period cohort 
+g election_cohort = 1993 if ele1v_post92==1992 | ele1v_post92==1993 
+replace election_cohort = 1996 if ele1v_post92==1994 | ele1v_post92==1995  | ele1v_post92==1996
+replace election_cohort = 2000 if ele1v_post92==1997 | ele1v_post92==1998 | ele1v_post92==1999
+
+* performing looping across outcome variables and dependent variables 
+eststo clear 
+foreach y in 1993 1996 2000 {
+	foreach v in dum doc safe pos garb yrsedu {
+		qui eststo e_c`y'_`v' : xtreg `v' i.year##c.num_dev if ///
+		election_cohort == `y', fe i(v_id) vce(cluster idkab_num) dfadj
+	}
+}
+
+```
+]
+
+.panel[.panel-name[VH Education]
+
+.center[<img src="fig1_yrsedu_combined.png" width = "750px" height="300px">]
+]
+
+.panel[.panel-name[Health Center]
+
+.center[<img src="fig1_dum_combined.png" width = "750px" height="300px">]
+]
+
+.panel[.panel-name[Doctors]
+
+.center[<img src="fig1_doc_combined.png" width = "750px" height="300px">]
+]
+
+.panel[.panel-name[Water]
+
+.center[<img src="fig1_safe_combined.png" width = "750px" height="300px">]
+]
+]
+
+
+---
+# Methods: identification strategy
+ 
 
 ---
 # Results

@@ -4,10 +4,12 @@
     <title>The Local Political Economy Effects of School Construction in Indonesia</title>
     <meta charset="utf-8" />
     <meta name="author" content="Originally by Martinez-Bravo (2017)" />
-    <meta name="date" content="2022-06-23" />
+    <meta name="date" content="2022-06-24" />
     <script src="libs/header-attrs-2.14/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
     <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
     <script src="libs/viz-1.8.2/viz.js"></script>
     <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
@@ -29,13 +31,28 @@ class: center, middle, inverse, title-slide
 ### Originally by Martinez-Bravo (2017)
 ]
 .date[
-### 23 June 2022
+### 24 June 2022
 ]
 
 ---
 
 
 
+
+
+
+&lt;style type="text/css"&gt;
+
+.remark-code {
+  font-size: 12px;
+}
+.huge .remark-code { /*Change made here*/
+  font-size: 200% !important;
+}
+.tiny .remark-code { /*Change made here*/
+  font-size: 50% !important;
+}
+&lt;/style&gt;
 
 
 
@@ -59,8 +76,8 @@ in Indonesia (the INPRES program) on **village governance and public good provis
 ---
 # The author's hypothesis
 
-<div id="htmlwidget-6e4bb7cde648c98f301d" style="width:800px;height:500px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-6e4bb7cde648c98f301d">{"x":{"diagram":" digraph {\n\n                  graph [layout = dot, rankdir = LR]\n  \n                  # node definitions with substituted label text\n                  node [shape = rectangle, fontsize = 7, fontname = \"Montserrat\"]\n                  input [label = \"INPRES school \nconstruction \nprogram\"]\n                  output [label = \"Increased education \nof village head \ncandidates\"]\n                  outcome1 [label = \"Better reallocation \nof village \nbudgets\"]\n                  outcome2 [label = \"Efficient project \nmanagement\"]\n                  impact [label = \"Better \nprovision of \npublic goods\"]\n                  \n                  # defining the edge\n                  input -> output -> outcome1 -> impact\n                  output -> outcome2 -> impact\n                  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-d833d168eb82ff4b4e23" style="width:800px;height:500px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-d833d168eb82ff4b4e23">{"x":{"diagram":" digraph {\n\n                  graph [layout = dot, rankdir = LR]\n  \n                  # node definitions with substituted label text\n                  node [shape = rectangle, fontsize = 7, fontname = \"Montserrat\"]\n                  input [label = \"INPRES school \nconstruction \nprogram\"]\n                  output [label = \"Increased education \nof village head \ncandidates\"]\n                  outcome1 [label = \"Better reallocation \nof village \nbudgets\"]\n                  outcome2 [label = \"Efficient project \nmanagement\"]\n                  impact [label = \"Better \nprovision of \npublic goods\"]\n                  \n                  # defining the edge\n                  input -> output -> outcome1 -> impact\n                  output -> outcome2 -> impact\n                  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
@@ -177,7 +194,7 @@ led to **increases in provision of key public goods**:
 ---
 # Methods: key institutional feature
 
-* Does the timing of increase in public good provision should correspond to the 
+* Does the timing of increase in public good provision correspond to the 
 timing of first post-1992 election? 
 
   `$$y_{vt} = \beta_0 + \sum^{2003}_{s=1990} (\delta_s \times Num\_{INPRES}_{v}) \gamma_{s} + \alpha_v + \delta_t +      \epsilon_{vt}$$`
@@ -199,6 +216,61 @@ timing of first post-1992 election?
     + 1992-1993 election group
     + 1994-1996 
     + 1997-2000
+    
+    
+---
+# Methods: key institutional feature 
+
+.panelset[
+.panel[.panel-name[Stata Code]
+
+
+```stata
+
+use "$raw_data/VHeduc_Data", clear
+
+// we set up the data as panel 
+xtset v_id year
+
+// first, we generate the election period cohort 
+g election_cohort = 1993 if ele1v_post92==1992 | ele1v_post92==1993 
+replace election_cohort = 1996 if ele1v_post92==1994 | ele1v_post92==1995  | ele1v_post92==1996
+replace election_cohort = 2000 if ele1v_post92==1997 | ele1v_post92==1998 | ele1v_post92==1999
+
+* performing looping across outcome variables and dependent variables 
+eststo clear 
+foreach y in 1993 1996 2000 {
+	foreach v in dum doc safe pos garb yrsedu {
+		qui eststo e_c`y'_`v' : xtreg `v' i.year##c.num_dev if ///
+		election_cohort == `y', fe i(v_id) vce(cluster idkab_num) dfadj
+	}
+}
+
+```
+]
+
+.panel[.panel-name[VH Education]
+
+.center[&lt;img src="fig1_yrsedu_combined.png" width = "750px" height="300px"&gt;]
+]
+
+.panel[.panel-name[Health Center]
+
+.center[&lt;img src="fig1_dum_combined.png" width = "750px" height="300px"&gt;]
+]
+
+.panel[.panel-name[Doctors]
+
+.center[&lt;img src="fig1_doc_combined.png" width = "750px" height="300px"&gt;]
+]
+
+.panel[.panel-name[Water]
+
+.center[&lt;img src="fig1_safe_combined.png" width = "750px" height="300px"&gt;]
+]
+]
+
+
 
 ---
 # Results

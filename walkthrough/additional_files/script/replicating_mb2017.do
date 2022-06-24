@@ -15,6 +15,7 @@ if "`c(username)'" == "Sean Hambali" {
 	gl do "C:/Users/Sean Hambali/Documents/GitHub/wb_isa_workshop/walkthrough/additional_files/script"
 	gl raw_data "C:/Users/Sean Hambali/Documents/GitHub/wb_isa_workshop/walkthrough/113664-V1/AEJApp-2015-0447_Dataset"
 	gl graph "C:/Users/Sean Hambali/Documents/GitHub/wb_isa_workshop/walkthrough/additional_files/graphs"
+	gl walkthrough "C:/Users/Sean Hambali/Documents/GitHub/wb_isa_workshop/walkthrough/slides/Walkthrough Slides"
 }
 
 /*
@@ -48,6 +49,11 @@ loc ti_safe "Access to safe drinking water"
 loc ti_dum "Health center"
 loc ti_yrsedu "VH years of education"
 
+// storing the titles for election periods 
+loc ti_1993 "1992-1993"
+loc ti_1996 "1994-1996"
+loc ti_2000 "1997-1999"
+
 // storing the x axis cutoff for each treatment period 
 loc cutoff_1993 = 2
 loc cutoff_1996 = 3 
@@ -71,7 +77,7 @@ foreach y in 1993 1996 2000 {
 					   2000.year#c.num_dev = "2000"
 					   2003.year#c.num_dev = "2003"
 					  )
-			ti("`ti_`v''")
+			ti("`ti_`v''" "`ti_`y'' election cohorts", s(large))
 			xscale(range(1 5)) xlab(1 "1990" 2 "1993" 3 "1996" 4 "2000" 5 "2003")
 			name("fig1_`y'_`v'", replace)
 		;
@@ -83,7 +89,27 @@ foreach y in 1993 1996 2000 {
 }
 
 // combining the plots 
-graph combine 
+foreach v in doc safe dum yrsedu {
+	
+	graph combine "$graph/fig1_1993_`v'.gph" ///
+				  "$graph/fig1_1996_`v'.gph" ///
+				  "$graph/fig1_2000_`v'.gph", ///
+				  ycommon iscale(*.8) r(1) ///
+				  xsize(8) ysize(3) ///
+				  name("fig1_`v'_combined", replace)
+	graph save fig1_`v'_combined "$walkthrough/fig1_`v'_combined.gph", replace
+	graph export "$walkthrough/fig1_`v'_combined.png", replace	
+}
+
+graph combine "$walkthrough/fig1_yrsedu_combined.gph" ///
+			  "$walkthrough/fig1_dum_combined.gph" ///
+			  "$walkthrough/fig1_doc_combined.gph" ///
+			  "$walkthrough/fig1_safe_combined.gph", ///
+			  ysize(7) xsize(6) ///
+			  iscale(*.7) c(1) ///
+			  name("fig1_all", replace)
+graph save fig1_all "$walkthrough/fig1_all.gph", replace 
+graph export "$walkthrough/fig1_all.png", replace
 
 
 /*
