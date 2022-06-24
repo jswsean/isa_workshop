@@ -4,7 +4,7 @@
     <title>The Local Political Economy Effects of School Construction in Indonesia</title>
     <meta charset="utf-8" />
     <meta name="author" content="Originally by Martinez-Bravo (2017)" />
-    <meta name="date" content="2022-06-22" />
+    <meta name="date" content="2022-06-23" />
     <script src="libs/header-attrs-2.14/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
@@ -29,7 +29,7 @@ class: center, middle, inverse, title-slide
 ### Originally by Martinez-Bravo (2017)
 ]
 .date[
-### 22 June 2022
+### 23 June 2022
 ]
 
 ---
@@ -59,8 +59,8 @@ in Indonesia (the INPRES program) on **village governance and public good provis
 ---
 # The author's hypothesis
 
-<div id="htmlwidget-3c162e8e5a91da4f7307" style="width:800px;height:500px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-3c162e8e5a91da4f7307">{"x":{"diagram":" digraph {\n\n                  graph [layout = dot, rankdir = LR]\n  \n                  # node definitions with substituted label text\n                  node [shape = rectangle, fontsize = 7, fontname = \"Montserrat\"]\n                  input [label = \"INPRES school \nconstruction \nprogram\"]\n                  output [label = \"Increased education \nof village head \ncandidates\"]\n                  outcome1 [label = \"Better reallocation \nof village \nbudgets\"]\n                  outcome2 [label = \"Efficient project \nmanagement\"]\n                  impact [label = \"Better \nprovision of \npublic goods\"]\n                  \n                  # defining the edge\n                  input -> output -> outcome1 -> impact\n                  output -> outcome2 -> impact\n                  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-6e4bb7cde648c98f301d" style="width:800px;height:500px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-6e4bb7cde648c98f301d">{"x":{"diagram":" digraph {\n\n                  graph [layout = dot, rankdir = LR]\n  \n                  # node definitions with substituted label text\n                  node [shape = rectangle, fontsize = 7, fontname = \"Montserrat\"]\n                  input [label = \"INPRES school \nconstruction \nprogram\"]\n                  output [label = \"Increased education \nof village head \ncandidates\"]\n                  outcome1 [label = \"Better reallocation \nof village \nbudgets\"]\n                  outcome2 [label = \"Efficient project \nmanagement\"]\n                  impact [label = \"Better \nprovision of \npublic goods\"]\n                  \n                  # defining the edge\n                  input -> output -> outcome1 -> impact\n                  output -> outcome2 -> impact\n                  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
@@ -172,6 +172,33 @@ led to **increases in provision of key public goods**:
 
 &lt;img src = 'event_timeline.jpg'&gt;
 &lt;figcaption&gt;&lt;i&gt;Source: Martinez-Bravo (2017)&lt;/i&gt;&lt;/figcaption&gt;
+
+
+---
+# Methods: key institutional feature
+
+* Does the timing of increase in public good provision should correspond to the 
+timing of first post-1992 election? 
+
+  `$$y_{vt} = \beta_0 + \sum^{2003}_{s=1990} (\delta_s \times Num\_{INPRES}_{v}) \gamma_{s} + \alpha_v + \delta_t +      \epsilon_{vt}$$`
+
+--
+
+* `\(v, t\)` denote villages and time periods, respectively
+
+--
+
+* `\(\gamma_s\)` denotes the event-study effects of INPRES schools 
+  
+--
+
+* Equation is estimated separately for different village groups (formed based on their election periods):
+
+--
+
+    + 1992-1993 election group
+    + 1994-1996 
+    + 1997-2000
 
 ---
 # Results

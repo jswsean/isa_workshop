@@ -183,8 +183,28 @@ led to **increases in provision of key public goods**:
 ---
 # Methods: key institutional feature
 
-* 
+* Does the timing of increase in public good provision should correspond to the 
+timing of first post-1992 election? 
 
+  $$y_{vt} = \beta_0 + \sum^{2003}_{s=1990} (\delta_s \times Num\_{INPRES}_{v}) \gamma_{s} + \alpha_v + \delta_t +      \epsilon_{vt}$$
+
+--
+
+* $v, t$ denote villages and time periods, respectively
+
+--
+
+* $\gamma_s$ denotes the event-study effects of INPRES schools 
+  
+--
+
+* Equation is estimated separately for different village groups (formed based on their election periods):
+
+--
+
+    + 1992-1993 election group
+    + 1994-1996 
+    + 1997-2000
 
 ---
 # Results
