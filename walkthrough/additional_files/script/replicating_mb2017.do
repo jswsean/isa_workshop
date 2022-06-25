@@ -78,7 +78,10 @@ foreach y in 1993 1996 2000 {
 					   2003.year#c.num_dev = "2003"
 					  )
 			ti("`ti_`v''" "`ti_`y'' election cohorts", s(large))
-			xscale(range(1 5)) xlab(1 "1990" 2 "1993" 3 "1996" 4 "2000" 5 "2003")
+			xscale(range(1 5)) 
+			xlab(1 "1990" 2 "1993" 3 "1996" 4 "2000" 5 "2003",
+			labs(large))
+			ylab(, labs(large))
 			name("fig1_`y'_`v'", replace)
 		;
 		#delimit cr	
@@ -116,3 +119,161 @@ graph export "$walkthrough/fig1_all.png", replace
 areg yrsedu i.year##c.num_dev if election_cohort == 2000, abs(v_id) clust(idkab_num)
 xtreg yrsedu i.year##c.num_dev if election_cohort == 2000, fe i(v_id) vce(cluster idkab_num) dfadj
 */
+
+
+/*
+	========================================================
+	Table 2: Looking at the determinants of timing election
+	========================================================
+*/
+
+/* first, we load the VHeduc data*/
+	use "$raw_data/VHeduc_Data", clear
+
+/* our goal here is to create a cross-sectional village-level dataset */
+	
+	/* we compute the change in several variables from 1986 - 1990 */
+	* but first, we create those variables for each year of 1986 and 1990
+	foreach v in lpopulation percrurHH daerah share_land_agr num_doctors ///
+	num_puskesmas safedrink1 criland_dum garbage_bin hardroad pedati ///
+	num_pri num_ju dum_KUD dum_otrocop dum_groupshop churches mosque ///
+	num_mktper num_bank {
+		g `v'1986 = ln(`v'+0.01) if year == 1986
+		g `v'1990 = ln(`v'+0.01) if year == 1990
+	}
+	
+	* we give special treatment for posyandu (following MB's original script)
+	g posyandu1986 = ln(num_posyandu+0.01) if year==1990
+	g posyandu1990= ln(num_posyandu+0.01) if year==1993
+
+	* now, we collapse the village-year data into cross-sectional village data 
+	* don't forget to install gtools!
+	*ssc install gtools, replace
+	gcollapse (firstnm) ele1v_post92 *1986 *1990 idkab_num, by(v_id)
+
+	* for these collapsed variables, we generate the pct change 
+	foreach v in lpopulation percrurHH daerah share_land_agr num_doctors ///
+	num_puskesmas safedrink1 criland_dum garbage_bin hardroad pedati ///
+	num_pri num_ju dum_KUD dum_otrocop dum_groupshop churches mosque ///
+	num_mktper num_bank posyandu {
+		g `v'_chg90 = `v'1990 - `v'1986
+	}	
+	
+// we store the variable labels for each of the predictors 
+	loc ti_lpopulation "Log population"
+	loc ti_percrurHH "Percentage of rural HH"
+	loc ti_daerah "Urban village"
+	loc ti_share_land_agr "Share of land in agriculture"
+	loc ti_num_doctors "Number of doctors"
+	loc ti_num_puskesmas "Number of health centers"
+	loc ti_posyandu "Number of health posts"
+	loc ti_safedrink1 "Safe drinking water"
+	loc ti_criland_dum "Critical land"
+	loc ti_garbage_bin "Bin garbage disposal"
+	loc ti_hardroad "Ashpalt/hard road"
+	loc ti_pedati "Horse-drawn cart"
+	loc ti_num_pri "Number of primary schools"
+	loc ti_num_ju "Number of high schools"
+	loc ti_dum_KUD "Village cooperative"
+	loc ti_dum_otrocop "Other type of village cooperative"
+	loc ti_dum_groupshop "Village group shop"
+	loc ti_churches "Number of churches"
+	loc ti_mosque "Number of mosques"
+	loc ti_num_mktper "Number of markets"
+	loc ti_num_bank "Number of banks"
+	
+	
+/* now , we run the cross-sectional regressions. */
+	
+	foreach v in lpopulation percrurHH daerah share_land_agr num_doctors ///
+	num_puskesmas safedrink1 criland_dum garbage_bin hardroad pedati ///
+	num_pri num_ju dum_KUD dum_otrocop dum_groupshop churches mosque ///
+	num_mktper num_bank posyandu {
+		
+		* using the same indep var for regressions 
+		cap drop regressor esample *_sd
+		g regressor = `v'_chg90
+		
+		* we'll run two models; 
+		* model#1 : this is the level regs
+		tempfile lv_`v'
+		qui parmby "reg ele1v_post92 regressor, clust(idkab_num)", ///
+		idstr("lv_`ti_`v''") saving(`lv_`v'', replace) level(90)
+		
+		* model#2 : this is the stdzd regs
+		* running the usual regs to obtain e(sample)
+		qui reg ele1v_post92 regressor, clust(idkab_num)
+		g esample = 1 if e(sample) == 1
+		foreach var in ele1v_post92 regressor {
+			qui su `var' if esample == 1, d
+			loc mean = r(mean)
+			loc sd = r(sd)
+			g `var'_sd = (`var' - `mean')/`sd'
+		}
+		tempfile sd_`v'
+		qui parmby "reg ele1v_post92_sd regressor_sd, clust(idkab_num)", ///
+		idstr("sd_`ti_`v''") saving(`sd_`v'', replace) level(90)
+	}
+	
+/* we append all the parmby data */	
+	
+	* but first, clear all the existing data 
+	drop _all
+	
+	* appending all data 
+	foreach v in lpopulation percrurHH daerah share_land_agr num_doctors ///
+	num_puskesmas safedrink1 criland_dum garbage_bin hardroad pedati ///
+	num_pri num_ju dum_KUD dum_otrocop dum_groupshop churches mosque ///
+	num_mktper num_bank posyandu {
+		
+		append using `lv_`v''
+		append using `sd_`v''
+		
+	}	
+	
+	* in the new dataset, we remove the _cons parameter 
+	drop if parm == "_cons"
+	g type = substr(idstr, 1,2)
+	replace idstr = substr(idstr, 4, strlen(idstr))
+	
+	* keep only select variables 
+	keep idstr type estimate stderr t min90 max90
+	encode idstr, gen(idstr_code)
+	replace idstr_code = idstr_code + .1 if type == "lv"
+	replace idstr_code = idstr_code - .1 if type == "sd"
+	
+/* visualizing the data */	
+	#delimit; 
+		twoway 
+		(scatter idstr_code estimate if type == "sd")
+		(rcap min90 max90 idstr_code if type == "sd", horizontal lc(red)),
+		ylab(1(1)21, valuelabel)
+		xlab(-.1(.02).1)
+		leg(off)
+		xli(0)
+		yti("Characteristics") 
+		ti("What determines the election timing?")
+		name("fig2", replace)
+	;
+	#delimit cr
+
+graph save fig2 "$walkthrough/fig2.gph", replace 
+graph export "$walkthrough/fig2.png", replace	
+
+
+/*
+	========================================================
+	Table 3: Looking at the determinants of timing election
+	========================================================
+*/
+
+
+/* first, we load the VHeduc data*/
+	use "$raw_data/VHeduc_Data", clear
+
+
+/
+	
+	
+	
+	

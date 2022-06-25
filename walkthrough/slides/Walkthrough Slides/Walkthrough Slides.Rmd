@@ -5,10 +5,11 @@ author: "Originally by Martinez-Bravo (2017)"
 date: "`r format(Sys.Date(), '%d %B %Y')`"
 output: 
   xaringan::moon_reader:
-    css: ['default', 'default-fonts', 'custom.css', 'xaringan-themer.css']
+    css: ['default', 'default-fonts', 'xaringan-themer.css']
     lib_dir: libs 
     nature: 
       countIncrementalSlides: false
+      beforeInit: "https://platform.twitter.com/widgets.js"
 
 ---
 
@@ -37,12 +38,24 @@ xaringanExtra::use_panelset()
 .tiny .remark-code { /*Change made here*/
   font-size: 50% !important;
 }
+
+.vvlarge { font-size: 170% }
+.vlarge { font-size: 150% }
+.large { font-size: 130% }
+.medlarge { font-size: 115% }
+.medsmall { font-size: 80% }
+.small { font-size: 60% }
+.tiny { font-size: 40% }
+
 ```
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = FALSE, 
                       message = FALSE,
                       warning = FALSE)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
 library(Statamarkdown)
 ```
 
@@ -231,7 +244,7 @@ timing of first post-1992 election?
 .panelset[
 .panel[.panel-name[Stata Code]
 
-```{stata figure1_code, results="hide", echo = TRUE}
+```{stata figure1_code, results="hide", echo = TRUE, eval = FALSE}
 
 use "$raw_data/VHeduc_Data", clear
 
@@ -278,15 +291,156 @@ foreach y in 1993 1996 2000 {
 
 
 ---
+
+name: identification-strategy
+class: medsmall
+
 # Methods: identification strategy
  
+* MB's main specification: 
+
+  $$Y_{vt} = \lambda_0 + \lambda_1 postel92_{vt} + \lambda_2 postel92_{vt} \times Num\_INPRES{v} + \alpha_v + \delta_t + \epsilon_{vt}$$ 
+--
+
+* $postel92_{vt} = 1$ for all periods $t$ after village $v$'s first post-1992 election
+
+--
+
+* Important features of the equation:
+
+--
+
+    + **Two way fixed effects**
+
+--
+    + Time FEs $\delta_t$ control for factors that change over time, and affect all villages similarly
+    (can you think of any example?)
+
+--
+    + Village FEs $\alpha_v$ control for the idiosyncrasies of each villages that 
+    do not change over time.
+
+--
+
+.center[<img src="fe_meme.png" width = "200px" height="200px">]
+
 
 ---
-# Results
+# Methods: identification strategy
+
+* Assume there are only two groups, *treated* and *controls*, and two periods, *before* and *after*
+
+* $A$ and $C$ are FEs of the treated and control groups, while $T$ is the time FE
+
+* $D$ is the treatment effect
+
+```{r did_table}
+did_table <- tribble(
+  ~village_group, ~period,  ~outcome,        ~d1,     ~d2,
+  "Treated",      "Before", "$Y = A$",       "",      "",
+  "Treated",      "After",  "$Y = A+(T+D)$", "$T+D$", "$D$",
+  "Control",      "Before", "$Y = C$",       "",      "",
+  "Control",      "After",  "$Y = C+(T)$",   "$T$",   ""
+)
+
+knitr::kable(did_table, format = 'html', 
+      col.names = c('Village group', 'Period', 'Outcome', 'Diff-1', 'Diff-2')) %>% 
+  kable_styling()
+
+```
+
+---
+# Methods: identification strategy
+
+* Identification strategy: **timing of the first post-1992 election should be conditionally random** (quasi-random)
+
+.panelset[
+.panel[.panel-name[Stata Code]
+```{stata figure2_code, results="hide", echo = TRUE, eval = FALSE}
+
+/* first, we load the VHeduc data*/
+
+	foreach v in `vars' {
+		
+		* using the same indep var for regressions 
+		cap drop regressor esample *_sd
+		g regressor = `v'_chg90
+		
+		* running the stdzd regs
+		* running the usual regs to obtain e(sample)
+		qui reg ele1v_post92 regressor, clust(idkab_num)
+		g esample = 1 if e(sample) == 1
+		foreach var in ele1v_post92 regressor {
+			qui su `var' if esample == 1, d
+			loc mean = r(mean)
+			loc sd = r(sd)
+			g `var'_sd = (`var' - `mean')/`sd'
+		}
+		tempfile sd_`v'
+		qui parmby "reg ele1v_post92_sd regressor_sd, clust(idkab_num)", ///
+		idstr("sd_`ti_`v''") saving(`sd_`v'', replace) level(90)
+	}
+```
+]
+
+.panel[.panel-name[Output]
+.center[<img src="fig2.png" width = "500px" height="300px">]
+]
+]
+
+---
+# Methods: identification strategy 
+
+* But what about other time-varying factors that affect INPRES program allocation and the electoral cycle? 
+
+--
+
+* MB flexibly controlled the initial school enrollment level (main determinant of INPRES school)
+
+--
+
+* MB also explored heterogeneity-analysis:
+
+$$
+\begin{aligned}
+Y_{st} = \beta_0 + \beta_1 postel92_{vt} & + \beta_2 postel92_{vt} \times BadService_{v} \\
+                                         & + \beta_3 postel92_{vt} + Num\_{INPRES}_{v} \\
+                                         & + \beta_4 postel92_{vt} \times BadService_v \times Num\_{INPRES}_{v} \\
+                                         & + \alpha_v + \delta_t + \epsilon_{vt}
+\end{aligned}
+$$
+
+--
+
+* $BadService_v = 1$ if public good $y$ was under-provided at baseline (1986)
+
+--
+
+* $\hat{\beta}_2$ and $\hat{\beta}_4$ should be $> 0$
+
+---
+# Results: How does school construction affect public good provision? 
+
+```{stata table_3, echo = TRUE}
+
+// 
+sysuse auto
+qui eststo m1: reg price mpg 
+qui eststo m2: reg price mpg rep78 trunk
+esttab m*
+```
 
 
 ---
-# Mechanisms 
+# Results: How does the effect vary? 
+
+
+---
+# Results: Robustness checks
+
+
+---
+# Results: What are the effect's mechanisms?
 
 
 ---

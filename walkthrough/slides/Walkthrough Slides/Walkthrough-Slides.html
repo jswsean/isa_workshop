@@ -4,7 +4,7 @@
     <title>The Local Political Economy Effects of School Construction in Indonesia</title>
     <meta charset="utf-8" />
     <meta name="author" content="Originally by Martinez-Bravo (2017)" />
-    <meta name="date" content="2022-06-24" />
+    <meta name="date" content="2022-06-25" />
     <script src="libs/header-attrs-2.14/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
@@ -14,7 +14,8 @@
     <script src="libs/viz-1.8.2/viz.js"></script>
     <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
     <script src="libs/grViz-binding-1.0.9/grViz.js"></script>
-    <link rel="stylesheet" href="custom.css" type="text/css" />
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+    <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -31,7 +32,7 @@ class: center, middle, inverse, title-slide
 ### Originally by Martinez-Bravo (2017)
 ]
 .date[
-### 24 June 2022
+### 25 June 2022
 ]
 
 ---
@@ -52,6 +53,15 @@ class: center, middle, inverse, title-slide
 .tiny .remark-code { /*Change made here*/
   font-size: 50% !important;
 }
+
+.vvlarge { font-size: 170% }
+.vlarge { font-size: 150% }
+.large { font-size: 130% }
+.medlarge { font-size: 115% }
+.medsmall { font-size: 80% }
+.small { font-size: 60% }
+.tiny { font-size: 40% }
+
 &lt;/style&gt;
 
 
@@ -76,8 +86,8 @@ in Indonesia (the INPRES program) on **village governance and public good provis
 ---
 # The author's hypothesis
 
-<div id="htmlwidget-d833d168eb82ff4b4e23" style="width:800px;height:500px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-d833d168eb82ff4b4e23">{"x":{"diagram":" digraph {\n\n                  graph [layout = dot, rankdir = LR]\n  \n                  # node definitions with substituted label text\n                  node [shape = rectangle, fontsize = 7, fontname = \"Montserrat\"]\n                  input [label = \"INPRES school \nconstruction \nprogram\"]\n                  output [label = \"Increased education \nof village head \ncandidates\"]\n                  outcome1 [label = \"Better reallocation \nof village \nbudgets\"]\n                  outcome2 [label = \"Efficient project \nmanagement\"]\n                  impact [label = \"Better \nprovision of \npublic goods\"]\n                  \n                  # defining the edge\n                  input -> output -> outcome1 -> impact\n                  output -> outcome2 -> impact\n                  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-0cb2e130f2d7933395e9" style="width:800px;height:500px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-0cb2e130f2d7933395e9">{"x":{"diagram":" digraph {\n\n                  graph [layout = dot, rankdir = LR]\n  \n                  # node definitions with substituted label text\n                  node [shape = rectangle, fontsize = 7, fontname = \"Montserrat\"]\n                  input [label = \"INPRES school \nconstruction \nprogram\"]\n                  output [label = \"Increased education \nof village head \ncandidates\"]\n                  outcome1 [label = \"Better reallocation \nof village \nbudgets\"]\n                  outcome2 [label = \"Efficient project \nmanagement\"]\n                  impact [label = \"Better \nprovision of \npublic goods\"]\n                  \n                  # defining the edge\n                  input -> output -> outcome1 -> impact\n                  output -> outcome2 -> impact\n                  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
@@ -271,13 +281,206 @@ foreach y in 1993 1996 2000 {
 ]
 
 
+---
+
+name: identification-strategy
+class: medsmall
+
+# Methods: identification strategy
+ 
+* MB's main specification: 
+
+  `$$Y_{vt} = \lambda_0 + \lambda_1 postel92_{vt} + \lambda_2 postel92_{vt} \times Num\_INPRES{v} + \alpha_v + \delta_t + \epsilon_{vt}$$` 
+--
+
+* `\(postel92_{vt} = 1\)` for all periods `\(t\)` after village `\(v\)`'s first post-1992 election
+
+--
+
+* Important features of the equation:
+
+--
+
+    + **Two way fixed effects**
+
+--
+    + Time FEs `\(\delta_t\)` control for factors that change over time, and affect all villages similarly
+    (can you think of any example?)
+
+--
+    + Village FEs `\(\alpha_v\)` control for the idiosyncrasies of each villages that 
+    do not change over time.
+
+--
+
+.center[&lt;img src="fe_meme.png" width = "200px" height="200px"&gt;]
+
 
 ---
-# Results
+# Methods: identification strategy
+
+* Assume there are only two groups, *treated* and *controls*, and two periods, *before* and *after*
+
+* `\(A\)` and `\(C\)` are FEs of the treated and control groups, while `\(T\)` is the time FE
+
+* `\(D\)` is the treatment effect
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Village group &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Period &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Outcome &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Diff-1 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Diff-2 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Treated &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Before &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; `\(Y = A\)` &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Treated &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; After &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; `\(Y = A+(T+D)\)` &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; `\(T+D\)` &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; `\(D\)` &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Control &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Before &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; `\(Y = C\)` &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Control &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; After &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; `\(Y = C+(T)\)` &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; `\(T\)` &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+# Methods: identification strategy
+
+* Identification strategy: **timing of the first post-1992 election should be conditionally random** (quasi-random)
+
+.panelset[
+.panel[.panel-name[Stata Code]
+
+```stata
+
+/* first, we load the VHeduc data*/
+
+	foreach v in `vars' {
+		
+		* using the same indep var for regressions 
+		cap drop regressor esample *_sd
+		g regressor = `v'_chg90
+		
+		* running the stdzd regs
+		* running the usual regs to obtain e(sample)
+		qui reg ele1v_post92 regressor, clust(idkab_num)
+		g esample = 1 if e(sample) == 1
+		foreach var in ele1v_post92 regressor {
+			qui su `var' if esample == 1, d
+			loc mean = r(mean)
+			loc sd = r(sd)
+			g `var'_sd = (`var' - `mean')/`sd'
+		}
+		tempfile sd_`v'
+		qui parmby "reg ele1v_post92_sd regressor_sd, clust(idkab_num)", ///
+		idstr("sd_`ti_`v''") saving(`sd_`v'', replace) level(90)
+	}
+```
+]
+
+.panel[.panel-name[Output]
+.center[&lt;img src="fig2.png" width = "500px" height="300px"&gt;]
+]
+]
+
+---
+# Methods: identification strategy 
+
+* But what about other time-varying factors that affect INPRES program allocation and the electoral cycle? 
+
+--
+
+* MB flexibly controlled the initial school enrollment level (main determinant of INPRES school)
+
+--
+
+* MB also explored heterogeneity-analysis:
+
+$$
+`\begin{aligned}
+Y_{st} = \beta_0 + \beta_1 postel92_{vt} &amp; + \beta_2 postel92_{vt} \times BadService_{v} \\
+                                         &amp; + \beta_3 postel92_{vt} + Num\_{INPRES}_{v} \\
+                                         &amp; + \beta_4 postel92_{vt} \times BadService_v \times Num\_{INPRES}_{v} \\
+                                         &amp; + \alpha_v + \delta_t + \epsilon_{vt}
+\end{aligned}`
+$$
+
+--
+
+* `\(BadService_v = 1\)` if public good `\(y\)` was under-provided at baseline (1986)
+
+--
+
+* `\(\hat{\beta}_2\)` and `\(\hat{\beta}_4\)` should be `\(&gt; 0\)`
+
+---
+# Results: How does school construction affect public good provision? 
+
+
+```stata
+sysuse auto
+qui eststo m1: reg price mpg 
+qui eststo m2: reg price mpg rep78 trunk
+esttab m*
+```
+
+```
+                      (1)             (2)   
+                    price           price   
+--------------------------------------------
+mpg                -238.9***       -252.3***
+                  (-4.50)         (-3.56)   
+
+rep78                               650.1   
+                                   (1.88)   
+
+trunk                               42.47   
+                                   (0.48)   
+
+_cons             11253.1***       8711.3***
+                   (9.61)          (3.64)   
+--------------------------------------------
+N                      74              69   
+--------------------------------------------
+t statistics in parentheses
+* p&lt;0.05, ** p&lt;0.01, *** p&lt;0.001
+```
 
 
 ---
-# Mechanisms 
+# Results: How does the effect vary? 
+
+
+---
+# Results: Robustness checks
+
+
+---
+# Results: What are the effect's mechanisms?
 
 
 ---
@@ -288,6 +491,7 @@ foreach y in 1993 1996 2000 {
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
 <script>var slideshow = remark.create({
 "countIncrementalSlides": false
 });
