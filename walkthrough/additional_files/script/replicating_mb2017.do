@@ -271,9 +271,161 @@ graph export "$walkthrough/fig2.png", replace
 /* first, we load the VHeduc data*/
 	use "$raw_data/VHeduc_Data", clear
 
+/* we set the data as panel data */
+	xtset v_id year
+	
+/* labelling the depvars */
+	la var dum "Primary health center in the village"
+	la var doc "Doctors in the village"
+	la var safe "Access to safe drinking water"
 
-/
+/* storing the relevant depvars in a global */
+	gl depvars dum doc safe 
+	
+/* running the regressions */	
+	eststo clear
+	
+	foreach v in $depvars {
+		
+		* model 1 
+		qui eststo m1_`v': xtreg `v' i.post92 i.year if !mi(`v'), ///
+		fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* adding baseline mean
+			qui su `v' if e(sample) == 1 
+			loc mean = r(mean)
+			qui estadd scalar depvar_mean `mean'
+			
+			
+		* model 2
+		qui eststo m2_`v': xtreg `v' i.post92##c.num_dev i.year if !mi(`v'), ///
+		fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* adding baseline mean
+			qui su `v' if e(sample) == 1 
+			loc mean = r(mean)
+			qui estadd scalar depvar_mean `mean'
+			
+		
+		* model 3
+		qui eststo m3_`v': xtreg `v' i.post92##i.inp_pos i.year if !mi(`v'), ///
+		fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* adding baseline mean
+			qui su `v' if e(sample) == 1 
+			loc mean = r(mean)
+			qui estadd scalar depvar_mean `mean'	
+		
+		* model 4 
+		qui eststo m4_`v': xtreg `v' i.post92##i.num_PSINPRES1980 i.year if !mi(`v'), ///
+		fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* adding baseline mean
+			qui su `v' if e(sample) == 1 
+			loc mean = r(mean)
+			qui estadd scalar depvar_mean `mean'
+
+		*tabulating the results (I'm not exporting it to .csv or .tex files. Just in the Stata console)
+		/*
+		#delimit;
+		esttab m* using "$walkthrough/table3_`v'.tex", 
+		n se ar2 
+		keep(1.post92 1.post92#c.num_dev 1.post92#1.inp_pos 
+		1.post92#1.num_PSINPRES1980 1.post92#2.num_PSINPRES1980)
+		coeflabels(1.post92 "Post first election after 1992"
+				   1.post92#c.num_dev "Post X num. INPRES schools"
+				   1.post92#1.inp_pos "Post X num. INPRES > 0"
+				   1.post92#1.num_PSINPRES1980 "Post x INPRES schools = 1"
+				   1.post92#2.num_PSINPRES1980 "Post x INPRES schools = 2"
+				  )
+		b(%4.3f) se(%4.3f) label
+		s(N r2 depvar_mean, 
+		fmt(%9.0f %9.3f %3.2f)
+		label("Observations" "R-Squared" "Dependent variable mean"))
+		;
+		#delimit cr	
+		*/
+		
+		#delimit; 
+		estout m*, 
+		cells(b(star fmt(3)) se(par fmt(3)))
+		stats(r2 N depvar_mean, fmt(%9.3f %9.0f %9.3f) 
+		labels("R-squared" "Observations" "Mean"))
+		keep(1.post92 1.post92#c.num_dev 1.post92#1.inp_pos 
+		1.post92#1.num_PSINPRES1980 1.post92#2.num_PSINPRES1980)
+		varlabels(1.post92 "Post first election after 1992"
+				  1.post92#c.num_dev "Post X num. INPRES schools"
+				  1.post92#1.inp_pos "Post X num. INPRES > 0"
+				  1.post92#1.num_PSINPRES1980 "Post x INPRES schools = 1"
+				  1.post92#2.num_PSINPRES1980 "Post x INPRES schools = 2")
+		;
+		#delimit cr
+		
+		eststo clear
+	}
 	
 	
 	
+/*
+	====================================================
+	TABLE 4. Heterogenous effects of school construction
+	====================================================
+*/	
+	
+	/* first, we load the raw data */
+	use "$raw_data/VHeduc_Data", clear
+	
+	/* setting the panel data */
+	xtset v_id year
+	
+	/* storing the depvars in the global */
+	gl depvars dum doc safe 
+	
+	/* running the regressions */
+	eststo clear
+	foreach v in $depvars {
+		
+		* generating dummy for whether bad baseline var/not 
+		cap drop badvar
+		g badvar = b`v'
+		
+		* running the first model : c.num_dev as the interaction variable 
+		qui eststo m1_`v' : xtreg `v' i.post92##c.num_dev##i.badvar ///
+		i.year if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* adding baseline mean
+			qui su `v' if e(sample) == 1 
+			loc mean = r(mean)
+			qui estadd scalar depvar_mean `mean'
+		
+		
+		* running the second model : positive inpres dummies as the interaction variable 
+		qui eststo m2_`v' : xtreg `v' i.post92##i.inp_pos##i.badvar ///
+		i.year if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* adding baseline mean
+			qui su `v' if e(sample) == 1 
+			loc mean = r(mean)
+			qui estadd scalar depvar_mean `mean'
+	}
+	
+	#delimit; 
+	estout m*, 
+	cells(b(star fmt(3)) se(par fmt(3)))
+	modelwidth(7)
+	stats(r2 N depvar_mean, fmt(%9.3f %9.0f %9.2f) 
+	labels("R-squared" "Observations" "Mean"))
+	keep(1.post92 1.post92#c.num_dev 1.post92#1.inp_pos 1.post92#1.badvar 
+	1.post92#1.badvar#c.num_dev 1.post92#1.inp_pos#1.badvar)
+	order(1.post92 1.post92#c.num_dev 1.post92#1.inp_pos 1.post92#1.badvar 
+	1.post92#1.badvar#c.num_dev 1.post92#1.inp_pos#1.badvar)
+	varlabels(1.post92 "Post first election after 1992"
+			  1.post92#c.num_dev "Post X INPRES N"
+			  1.post92#1.inp_pos "Post X INPRES > 0"
+			  1.post92#1.badvar "Post X bad service"
+			  1.post92#1.badvar#c.num_dev "Post x bad service X INPRES intensity"
+			  1.post92#1.inp_pos#1.badvar "Post x bad service X INPRES > 0"
+			  )
+	;
+	#delimit cr
 	

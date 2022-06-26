@@ -4,7 +4,7 @@
     <title>The Local Political Economy Effects of School Construction in Indonesia</title>
     <meta charset="utf-8" />
     <meta name="author" content="Originally by Martinez-Bravo (2017)" />
-    <meta name="date" content="2022-06-25" />
+    <meta name="date" content="2022-06-26" />
     <script src="libs/header-attrs-2.14/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
@@ -32,7 +32,7 @@ class: center, middle, inverse, title-slide
 ### Originally by Martinez-Bravo (2017)
 ]
 .date[
-### 25 June 2022
+### 26 June 2022
 ]
 
 ---
@@ -50,8 +50,21 @@ class: center, middle, inverse, title-slide
 .huge .remark-code { /*Change made here*/
   font-size: 200% !important;
 }
-.tiny .remark-code { /*Change made here*/
+
+.medsmall .remark-code { /*Change made here*/
+  font-size: 80% !important;
+}
+
+.small .remark-code { /*Change made here*/
+  font-size: 70% !important;
+}
+
+.vsmall .remark-code { /*Change made here*/
   font-size: 50% !important;
+}
+
+.tiny .remark-code { /*Change made here*/
+  font-size: 40% !important;
 }
 
 .vvlarge { font-size: 170% }
@@ -60,6 +73,7 @@ class: center, middle, inverse, title-slide
 .medlarge { font-size: 115% }
 .medsmall { font-size: 80% }
 .small { font-size: 60% }
+.vsmall { font-size: 50% }
 .tiny { font-size: 40% }
 
 &lt;/style&gt;
@@ -86,8 +100,8 @@ in Indonesia (the INPRES program) on **village governance and public good provis
 ---
 # The author's hypothesis
 
-<div id="htmlwidget-0cb2e130f2d7933395e9" style="width:800px;height:500px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-0cb2e130f2d7933395e9">{"x":{"diagram":" digraph {\n\n                  graph [layout = dot, rankdir = LR]\n  \n                  # node definitions with substituted label text\n                  node [shape = rectangle, fontsize = 7, fontname = \"Montserrat\"]\n                  input [label = \"INPRES school \nconstruction \nprogram\"]\n                  output [label = \"Increased education \nof village head \ncandidates\"]\n                  outcome1 [label = \"Better reallocation \nof village \nbudgets\"]\n                  outcome2 [label = \"Efficient project \nmanagement\"]\n                  impact [label = \"Better \nprovision of \npublic goods\"]\n                  \n                  # defining the edge\n                  input -> output -> outcome1 -> impact\n                  output -> outcome2 -> impact\n                  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-3c39ae5a71b0c8f82f83" style="width:800px;height:500px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3c39ae5a71b0c8f82f83">{"x":{"diagram":" digraph {\n\n                  graph [layout = dot, rankdir = LR]\n  \n                  # node definitions with substituted label text\n                  node [shape = rectangle, fontsize = 7, fontname = \"Montserrat\"]\n                  input [label = \"INPRES school \nconstruction \nprogram\"]\n                  output [label = \"Increased education \nof village head \ncandidates\"]\n                  outcome1 [label = \"Better reallocation \nof village \nbudgets\"]\n                  outcome2 [label = \"Efficient project \nmanagement\"]\n                  impact [label = \"Better \nprovision of \npublic goods\"]\n                  \n                  # defining the edge\n                  input -> output -> outcome1 -> impact\n                  output -> outcome2 -> impact\n                  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
@@ -433,47 +447,330 @@ $$
 
 * `\(BadService_v = 1\)` if public good `\(y\)` was under-provided at baseline (1986)
 
---
-
-* `\(\hat{\beta}_2\)` and `\(\hat{\beta}_4\)` should be `\(&gt; 0\)`
-
 ---
-# Results: How does school construction affect public good provision? 
+# .medsmall[Results: How does school construction affect public good provision?]
 
+.panelset[
+.panel[.panel-name[Health Center]
+.pull-left[
+.small[
 
 ```stata
-sysuse auto
-qui eststo m1: reg price mpg 
-qui eststo m2: reg price mpg rep78 trunk
-esttab m*
+
+/* first, we load the VHeduc data*/
+	use "$raw_data/VHeduc_Data", clear
+
+/* we set the data as panel data */
+	xtset v_id year
+
+* model 1 
+	qui eststo m1_dum: xtreg dum i.post92 i.year if !mi(dum), ///
+	fe i(v_id) vce(cluster idkab_num) dfadj
+			
+* model 2
+	qui eststo m2_dum: xtreg dum i.post92##c.num_dev i.year if !mi(dum), ///
+	fe i(v_id) vce(cluster idkab_num) dfadj
+		
+* model 3
+	qui eststo m3_dum: xtreg dum i.post92##i.inp_pos i.year if !mi(dum), ///
+	fe i(v_id) vce(cluster idkab_num) dfadj
+
+* model 4 
+	qui eststo m4_dum: xtreg dum i.post92##i.num_PSINPRES1980 i.year if !mi(dum), ///
+	fe i(v_id) vce(cluster idkab_num) dfadj
+		
+*tabulating the results
+	#delimit; 
+	estout m*, 
+	cells(b(star fmt(3)) se(par fmt(3)))
+	stats(r2 N, fmt(%9.3f %9.0f %9.3f) 
+	labels("R-squared" "Observations"))
+	keep(1.post92 1.post92#c.num_dev 1.post92#1.inp_pos 
+	1.post92#1.num_PSINPRES1980 1.post92#2.num_PSINPRES1980)
+	varlabels(1.post92 "Post first election after 1992"
+			  1.post92#c.num_dev "Post X num. INPRES schools"
+			  1.post92#1.inp_pos "Post X num. INPRES &gt; 0"
+			  1.post92#1.num_PSINPRES1980 "Post x INPRES schools = 1"
+			  1.post92#2.num_PSINPRES1980 "Post x INPRES schools = 2")
+	;
+	#delimit cr	
 ```
+]
+]
+
+.pull-right[
+.small[
 
 ```
-                      (1)             (2)   
-                    price           price   
---------------------------------------------
-mpg                -238.9***       -252.3***
-                  (-4.50)         (-3.56)   
+delimiter now ;
 
-rep78                               650.1   
-                                   (1.88)   
+----------------------------------------------------------------------------
+                   m1_dum          m2_dum          m3_dum          m4_dum   
+                     b/se            b/se            b/se            b/se   
+----------------------------------------------------------------------------
+Post fi~1992       -0.005          -0.005          -0.016***       -0.017***
+                  (0.003)         (0.003)         (0.004)         (0.004)   
+Post .. IN~s                        0.012***                                
+                                  (0.003)                                   
+Post .. IN~0                                        0.017***                
+                                                  (0.004)                   
+Post x INP~1                                                        0.013** 
+                                                                  (0.005)   
+Post x INP~2                                                        0.024***
+                                                                  (0.006)   
+----------------------------------------------------------------------------
+R-squared           0.062           0.063           0.063           0.063   
+Observations        59130           59130           59130           59130   
+----------------------------------------------------------------------------
+*, ** and *** denote significance at 5%, 1%, and 0.1%.
 
-trunk                               42.47   
-                                   (0.48)   
-
-_cons             11253.1***       8711.3***
-                   (9.61)          (3.64)   
---------------------------------------------
-N                      74              69   
---------------------------------------------
-t statistics in parentheses
-* p&lt;0.05, ** p&lt;0.01, *** p&lt;0.001
+delimiter now cr
 ```
+]
+]
+]
 
+.panel[.panel-name[Doctors]
 
+.pull-left[
+.small[
+
+```stata
+/* first, we load the VHeduc data*/
+	use "$raw_data/VHeduc_Data", clear
+
+/* we set the data as panel data */
+	xtset v_id year
+
+* model 1 
+	qui eststo m1_doc: xtreg doc i.post92 i.year if !mi(doc), ///
+	fe i(v_id) vce(cluster idkab_num) dfadj
+			
+* model 2
+	qui eststo m2_doc: xtreg doc i.post92##c.num_dev i.year if !mi(doc), ///
+	fe i(v_id) vce(cluster idkab_num) dfadj
+		
+* model 3
+	qui eststo m3_doc: xtreg doc i.post92##i.inp_pos i.year if !mi(doc), ///
+	fe i(v_id) vce(cluster idkab_num) dfadj
+
+* model 4 
+	qui eststo m4_doc: xtreg doc i.post92##i.num_PSINPRES1980 i.year if !mi(doc), ///
+	fe i(v_id) vce(cluster idkab_num) dfadj
+		
+*tabulating the results
+	#delimit; 
+	estout m*, 
+	cells(b(star fmt(3)) se(par fmt(3)))
+	stats(r2 N, fmt(%9.3f %9.0f %9.3f) 
+	labels("R-squared" "Observations"))
+	keep(1.post92 1.post92#c.num_dev 1.post92#1.inp_pos 
+	1.post92#1.num_PSINPRES1980 1.post92#2.num_PSINPRES1980)
+	varlabels(1.post92 "Post first election after 1992"
+			  1.post92#c.num_dev "Post X num. INPRES schools"
+			  1.post92#1.inp_pos "Post X num. INPRES &gt; 0"
+			  1.post92#1.num_PSINPRES1980 "Post x INPRES schools = 1"
+			  1.post92#2.num_PSINPRES1980 "Post x INPRES schools = 2")
+	;
+	#delimit cr	
+```
+]
+]
+
+.pull-right[
+.small[
+
+```
+delimiter now ;
+
+----------------------------------------------------------------------------
+                   m1_doc          m2_doc          m3_doc          m4_doc   
+                     b/se            b/se            b/se            b/se   
+----------------------------------------------------------------------------
+Post fi~1992        0.001           0.001          -0.006          -0.006   
+                  (0.003)         (0.003)         (0.005)         (0.005)   
+Post .. IN~s                        0.006                                   
+                                  (0.003)                                   
+Post .. IN~0                                        0.010                   
+                                                  (0.005)                   
+Post x INP~1                                                        0.009   
+                                                                  (0.005)   
+Post x INP~2                                                        0.011   
+                                                                  (0.007)   
+----------------------------------------------------------------------------
+R-squared           0.068           0.068           0.068           0.068   
+Observations        59130           59130           59130           59130   
+----------------------------------------------------------------------------
+*, ** and *** denote significance at 5%, 1%, and 0.1%.
+
+delimiter now cr
+```
+]
+]
+]
+
+.panel[.panel-name[Drinking Water]
+.pull-left[
+.small[
+
+```stata
+/* first, we load the VHeduc data*/
+	use "$raw_data/VHeduc_Data", clear
+
+/* we set the data as panel data */
+	xtset v_id year
+
+* model 1 
+	qui eststo m1_safe: xtreg safe i.post92 i.year if !mi(safe), ///
+	fe i(v_id) vce(cluster idkab_num) dfadj
+			
+* model 2
+	qui eststo m2_safe: xtreg safe i.post92##c.num_dev i.year if !mi(safe), ///
+	fe i(v_id) vce(cluster idkab_num) dfadj
+		
+* model 3
+	qui eststo m3_safe: xtreg safe i.post92##i.inp_pos i.year if !mi(safe), ///
+	fe i(v_id) vce(cluster idkab_num) dfadj
+
+* model 4 
+	qui eststo m4_safe: xtreg safe i.post92##i.num_PSINPRES1980 i.year if !mi(safe), ///
+	fe i(v_id) vce(cluster idkab_num) dfadj
+		
+*tabulating the results
+	#delimit; 
+	estout m*, 
+	cells(b(star fmt(3)) se(par fmt(3)))
+	stats(r2 N, fmt(%9.3f %9.0f %9.3f) 
+	labels("R-squared" "Observations"))
+	keep(1.post92 1.post92#c.num_dev 1.post92#1.inp_pos 
+	1.post92#1.num_PSINPRES1980 1.post92#2.num_PSINPRES1980)
+	varlabels(1.post92 "Post first election after 1992"
+			  1.post92#c.num_dev "Post X num. INPRES schools"
+			  1.post92#1.inp_pos "Post X num. INPRES &gt; 0"
+			  1.post92#1.num_PSINPRES1980 "Post x INPRES schools = 1"
+			  1.post92#2.num_PSINPRES1980 "Post x INPRES schools = 2")
+	;
+	#delimit cr	
+```
+]
+]
+
+.pull-right[
+.small[
+
+```
+delimiter now ;
+
+----------------------------------------------------------------------------
+                  m1_safe         m2_safe         m3_safe         m4_safe   
+                     b/se            b/se            b/se            b/se   
+----------------------------------------------------------------------------
+Post fi~1992       -0.003          -0.005          -0.017*         -0.017*  
+                  (0.005)         (0.005)         (0.007)         (0.007)   
+Post .. IN~s                        0.018*                                  
+                                  (0.007)                                   
+Post .. IN~0                                        0.019*                  
+                                                  (0.009)                   
+Post x INP~1                                                        0.010   
+                                                                  (0.009)   
+Post x INP~2                                                        0.036*  
+                                                                  (0.014)   
+----------------------------------------------------------------------------
+R-squared           0.047           0.048           0.047           0.048   
+Observations        39420           39420           39420           39420   
+----------------------------------------------------------------------------
+*, ** and *** denote significance at 5%, 1%, and 0.1%.
+
+delimiter now cr
+```
+]
+]
+]
+]
 ---
-# Results: How does the effect vary? 
+# .medsmall[Results: How does the effect vary?]
 
+.panelset[
+
+.panel[.panel-name[Stata Code]
+.small[
+
+```stata
+  
+  use "$raw_data/VHeduc_Data", clear
+	
+	/* setting the panel data */
+	xtset v_id year
+	
+	/* storing the depvars in the global */
+	gl depvars dum doc safe 
+	
+	/* running the regressions */
+	eststo clear
+	foreach v in $depvars {
+		
+		* generating dummy for whether bad baseline var/not 
+		cap drop badvar
+		g badvar = b`v'
+		
+		* running the first model : c.num_dev as the interaction variable 
+		qui eststo m1_`v' : xtreg `v' i.post92##c.num_dev##i.badvar ///
+		i.year if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* adding baseline mean
+			qui su `v' if e(sample) == 1 
+			loc mean = r(mean)
+			qui estadd scalar depvar_mean `mean'
+		
+		
+		* running the second model : positive inpres dummies as the interaction variable 
+		qui eststo m2_`v' : xtreg `v' i.post92##i.inp_pos##i.badvar ///
+		i.year if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* adding baseline mean
+			qui su `v' if e(sample) == 1 
+			loc mean = r(mean)
+			qui estadd scalar depvar_mean `mean'
+	}
+```
+]
+]
+
+.panel[.panel-name[Output]
+
+```
+  5.                 
+  9.                 
+
+delimiter now ;
+
+------------------------------------------------------------------------------
+              m1_dum     m2_dum     m1_doc     m2_doc    m1_safe    m2_safe   
+                b/se       b/se       b/se       b/se       b/se       b/se   
+------------------------------------------------------------------------------
+Post fi~1992  -0.056***  -0.055***  -0.063***  -0.063***  -0.044***  -0.044***
+             (0.005)    (0.005)    (0.005)    (0.005)    (0.006)    (0.006)   
+Post X INP~N   0.000                 0.000                -0.000              
+             (0.000)               (0.000)               (0.000)              
+Post X INP~0             -0.001                -0.000                 0.000   
+                        (0.001)               (0.000)               (0.000)   
+Post X bad~e   0.055***   0.040***   0.069***   0.060***   0.160***   0.126***
+             (0.004)    (0.005)    (0.005)    (0.007)    (0.019)    (0.033)   
+Post x bad~e   0.014***              0.007                 0.057*             
+             (0.003)               (0.004)               (0.023)              
+Post x bad~0              0.021***              0.013*                0.057   
+                        (0.005)               (0.005)               (0.036)   
+------------------------------------------------------------------------------
+R-squared      0.066      0.066      0.072      0.072      0.065      0.064   
+Observations   59130      59130      59130      59130      39420      39420   
+Mean            0.10       0.10       0.12       0.12       0.77       0.77   
+------------------------------------------------------------------------------
+*, ** and *** denote significance at 5%, 1%, and 0.1%.
+
+delimiter now cr
+```
+]
+]
 
 ---
 # Results: Robustness checks
