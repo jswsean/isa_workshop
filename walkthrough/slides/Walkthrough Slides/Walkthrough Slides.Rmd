@@ -818,9 +818,165 @@ $$
 ---
 # Results: Robustness checks
 
+* Potential concerns: 
+
+    1. Could different village sizes explain the results?
+    
+--
+
+    2. Could villages with different pre-treatment levels have different underlying trends in public good provision?
+    
+--
+
+    3. What about the 3 variables that were found to be correlated with timing elections? 
+    
+--
+
+    4. But INPRES school allocation is not random, right? 
+    
+--
+
+    5. Are there any pre-trends?
 
 ---
-# Results: What are the effect's mechanisms?
+# Results: Robustness checks
+
+.panelset[
+
+.panel[.panel-name[Stata Code]
+.small[
+```{stata table5_code, eval = FALSE, echo = TRUE}
+  
+  /* first, we load the raw data */
+	use "$raw_data/VHeduc_Data", clear
+	
+	/* setting the panel data */
+	xtset v_id year
+	
+	/* storing the depvars in the global */
+	gl depvars dum doc safe 
+	
+	/* looping across the dependent variable and specification */
+	foreach v in $depvars {
+		
+		* spec #1: controlling for log population
+		qui eststo m1_`v': xtreg `v' i.post92##c.num_dev i.year lpopulation if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* spec #2: controlling for pre-treatment dep var x year FE
+		qui eststo m2_`v': xtreg `v' i.post92##c.num_dev i.year i.year#c.`v'_pre if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* spec #3: controlling for pre-treatment covariates 
+		qui eststo m3_`v': xtreg `v' i.post92##c.num_dev i.year i.year##c.dum_otrocop_pre i.year##c.num_bank_pre i.year##c.pedati_pre if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* spec #4: controlling for initial school enrollment and enrollment / water sanitation X year FE
+		qui eststo m4_`v': xtreg `v' i.post92##c.num_dev i.year i.year#c.sch_rate86 i.year#i.Inptoil if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* spec #5: exploring pre-trends
+		qui eststo m5_`v': xtreg `v' post92 ye_3_1_num_dev-ye_3_4_num_dev i.year if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* tabulating the results
+		estout m*, cells(b(star fmt(3)) se(par fmt(3))) modelwidth(7) stats(r2 N, fmt(%9.3f %9.0f) labels("R-squared" "Observations")) keep(1.post92 1.post92#c.num_dev ye_3_1_num_dev ye_3_2_num_dev ye_3_3_num_dev) ///
+		order(1.post92 1.post92#c.num_dev ye_3_3_num_dev ye_3_2_num_dev ye_3_1_num_dev) ///
+		varlabels(1.post92 "Post" 1.post92#c.num_dev "Post X INPRES N" ye_3_1_num_dev "3 year before X INPRES N" ye_3_2_num_dev "2 year before X INPRES N" ye_3_3_num_dev "1 year before X INPRES N")
+		
+		eststo clear 
+	}
+```
+
+]
+]
+
+.panel[.panel-name[Health Centers]
+```{stata table5_health_output, echo = FALSE}
+/* first, we load the raw data */
+  gl raw_data "C:/Users/Sean Hambali/Documents/GitHub/wb_isa_workshop/walkthrough/113664-V1/AEJApp-2015-0447_Dataset"
+	use "$raw_data/VHeduc_Data", clear
+	
+	/* setting the panel data */
+	qui xtset v_id year
+		
+	* spec #1: controlling for log population
+	qui eststo m1_dum: xtreg dum i.post92##c.num_dev i.year lpopulation if !mi(dum), fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* spec #2: controlling for pre-treatment dep var x year FE
+	qui eststo m2_dum: xtreg dum i.post92##c.num_dev i.year i.year#c.dum_pre if !mi(dum), fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* spec #3: controlling for pre-treatment covariates 
+	qui eststo m3_dum: xtreg dum i.post92##c.num_dev i.year i.year##c.dum_otrocop_pre i.year##c.num_bank_pre i.year##c.pedati_pre if !mi(dum), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+	* spec #4: controlling for initial school enrollment and enrollment / water sanitation X year FE
+	qui eststo m4_dum: xtreg dum i.post92##c.num_dev i.year i.year#c.sch_rate86 i.year#i.Inptoil if !mi(dum), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+	* spec #5: 
+	qui eststo m5_dum: xtreg dum post92 ye_3_1_num_dev-ye_3_4_num_dev i.year if !mi(dum), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+	* estout 
+	estout m*, cells(b(star fmt(3)) se(par fmt(3))) modelwidth(8) stats(r2 N, fmt(%9.3f %9.0f) labels("R-squared" "Observations")) keep(1.post92 1.post92#c.num_dev ye_3_1_num_dev ye_3_2_num_dev ye_3_3_num_dev) order(1.post92 1.post92#c.num_dev ye_3_3_num_dev ye_3_2_num_dev ye_3_1_num_dev) varlabels(1.post92 "Post" 1.post92#c.num_dev "Post X INPRES N" ye_3_1_num_dev "3 year before X INPRES N" ye_3_2_num_dev "2 year before X INPRES N" ye_3_3_num_dev "1 year before X INPRES N") note(*, ** and *** denote significance at 5%, 1%, and 0.1%.)
+```
+]
+
+.panel[.panel-name[Doctors]
+```{stata table5_doctor_output, echo = FALSE}
+/* first, we load the raw data */
+  gl raw_data "C:/Users/Sean Hambali/Documents/GitHub/wb_isa_workshop/walkthrough/113664-V1/AEJApp-2015-0447_Dataset"
+	use "$raw_data/VHeduc_Data", clear
+	
+	/* setting the panel data */
+	qui xtset v_id year
+		
+	* spec #1: controlling for log population
+	qui eststo m1_doc: xtreg doc i.post92##c.num_dev i.year lpopulation if !mi(doc), fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* spec #2: controlling for pre-treatment dep var x year FE
+	qui eststo m2_doc: xtreg doc i.post92##c.num_dev i.year i.year#c.doc_pre if !mi(doc), fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* spec #3: controlling for pre-treatment covariates 
+	qui eststo m3_doc: xtreg doc i.post92##c.num_dev i.year i.year##c.dum_otrocop_pre i.year##c.num_bank_pre i.year##c.pedati_pre if !mi(doc), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+	* spec #4: controlling for initial school enrollment and enrollment / water sanitation X year FE
+	qui eststo m4_doc: xtreg doc i.post92##c.num_dev i.year i.year#c.sch_rate86 i.year#i.Inptoil if !mi(doc), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+	* spec #5: 
+	qui eststo m5_doc: xtreg doc post92 ye_3_1_num_dev-ye_3_4_num_dev i.year if !mi(doc), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+	* estout 
+	estout m*, cells(b(star fmt(3)) se(par fmt(3))) modelwidth(8) stats(r2 N, fmt(%9.3f %9.0f) labels("R-squared" "Observations")) keep(1.post92 1.post92#c.num_dev ye_3_1_num_dev ye_3_2_num_dev ye_3_3_num_dev) order(1.post92 1.post92#c.num_dev ye_3_3_num_dev ye_3_2_num_dev ye_3_1_num_dev) varlabels(1.post92 "Post" 1.post92#c.num_dev "Post X INPRES N" ye_3_1_num_dev "3 year before X INPRES N" ye_3_2_num_dev "2 year before X INPRES N" ye_3_3_num_dev "1 year before X INPRES N") note(*, ** and *** denote significance at 5%, 1%, and 0.1%.)
+```
+
+]
+
+.panel[.panel-name[Drinking Water]
+```{stata table5_water_output, echo = FALSE}
+  gl raw_data "C:/Users/Sean Hambali/Documents/GitHub/wb_isa_workshop/walkthrough/113664-V1/AEJApp-2015-0447_Dataset"
+	use "$raw_data/VHeduc_Data", clear
+	
+	/* setting the panel data */
+	qui xtset v_id year
+		
+	* spec #1: controlling for log population
+	qui eststo m1_safe: xtreg safe i.post92##c.num_dev i.year lpopulation if !mi(safe), fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* spec #2: controlling for pre-treatment dep var x year FE
+	qui eststo m2_safe: xtreg safe i.post92##c.num_dev i.year i.year#c.safe_pre if !mi(safe), fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* spec #3: controlling for pre-treatment covariates 
+	qui eststo m3_safe: xtreg safe i.post92##c.num_dev i.year i.year##c.dum_otrocop_pre i.year##c.num_bank_pre i.year##c.pedati_pre if !mi(safe), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+	* spec #4: controlling for initial school enrollment and enrollment / water sanitation X year FE
+	qui eststo m4_safe: xtreg safe i.post92##c.num_dev i.year i.year#c.sch_rate86 i.year#i.Inptoil if !mi(safe), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+	* spec #5: 
+	qui eststo m5_safe: xtreg safe post92 ye_3_1_num_dev-ye_3_4_num_dev i.year if !mi(safe), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+	* estout 
+	estout m*, cells(b(star fmt(3)) se(par fmt(3))) modelwidth(8) stats(r2 N, fmt(%9.3f %9.0f) labels("R-squared" "Observations")) keep(1.post92 1.post92#c.num_dev ye_3_1_num_dev ye_3_2_num_dev ye_3_3_num_dev) order(1.post92 1.post92#c.num_dev ye_3_3_num_dev ye_3_2_num_dev ye_3_1_num_dev) varlabels(1.post92 "Post" 1.post92#c.num_dev "Post X INPRES N" ye_3_1_num_dev "3 year before X INPRES N" ye_3_2_num_dev "2 year before X INPRES N" ye_3_3_num_dev "1 year before X INPRES N") note(*, ** and *** denote significance at 5%, 1%, and 0.1%.)
+```
+
+]
+]
+
+---
+# .medsmall[Results: What are the effect's mechanisms?]
 
 
 ---

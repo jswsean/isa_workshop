@@ -429,3 +429,48 @@ graph export "$walkthrough/fig2.png", replace
 	;
 	#delimit cr
 	
+	
+	
+	
+/*
+	=============================================================
+	TABLE 5. Robustness checks of the school construction effects
+	=============================================================
+*/	
+	
+	/* first, we load the raw data */
+	use "$raw_data/VHeduc_Data", clear
+	
+	/* setting the panel data */
+	xtset v_id year
+	
+	/* storing the depvars in the global */
+	gl depvars dum doc safe 
+	
+	/* looping across the dependent variable and specification */
+	foreach v in $depvars {
+		
+		* spec #1: controlling for log population
+		qui eststo m1_`v': xtreg `v' i.post92##c.num_dev i.year lpopulation if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* spec #2: controlling for pre-treatment dep var x year FE
+		qui eststo m2_`v': xtreg `v' i.post92##c.num_dev i.year i.year#c.`v'_pre if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* spec #3: controlling for pre-treatment covariates 
+		qui eststo m3_`v': xtreg `v' i.post92##c.num_dev i.year i.year##c.dum_otrocop_pre i.year##c.num_bank_pre i.year##c.pedati_pre if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* spec #4: controlling for initial school enrollment and enrollment / water sanitation X year FE
+		qui eststo m4_`v': xtreg `v' i.post92##c.num_dev i.year i.year#c.sch_rate86 i.year#i.Inptoil if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* spec #5: 
+		qui eststo m5_`v': xtreg `v' post92 ye_3_1_num_dev-ye_3_4_num_dev i.year if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* estout 
+		estout m*, cells(b(star fmt(3)) se(par fmt(3))) modelwidth(7) stats(r2 N, fmt(%9.3f %9.0f) labels("R-squared" "Observations")) keep(1.post92 1.post92#c.num_dev ye_3_1_num_dev ye_3_2_num_dev ye_3_3_num_dev) order(1.post92 1.post92#c.num_dev ye_3_3_num_dev ye_3_2_num_dev ye_3_1_num_dev) varlabels(1.post92 "Post" 1.post92#c.num_dev "Post X INPRES N" ye_3_1_num_dev "3 year before X INPRES N" ye_3_2_num_dev "2 year before X INPRES N" ye_3_3_num_dev "1 year before X INPRES N")
+		
+		eststo clear 
+	}
+	
+	
+	
+	

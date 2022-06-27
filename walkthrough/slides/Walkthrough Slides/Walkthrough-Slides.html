@@ -4,7 +4,7 @@
     <title>The Local Political Economy Effects of School Construction in Indonesia</title>
     <meta charset="utf-8" />
     <meta name="author" content="Originally by Martinez-Bravo (2017)" />
-    <meta name="date" content="2022-06-26" />
+    <meta name="date" content="2022-06-27" />
     <script src="libs/header-attrs-2.14/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
@@ -32,7 +32,7 @@ class: center, middle, inverse, title-slide
 ### Originally by Martinez-Bravo (2017)
 ]
 .date[
-### 26 June 2022
+### 27 June 2022
 ]
 
 ---
@@ -100,8 +100,8 @@ in Indonesia (the INPRES program) on **village governance and public good provis
 ---
 # The author's hypothesis
 
-<div id="htmlwidget-3c39ae5a71b0c8f82f83" style="width:800px;height:500px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-3c39ae5a71b0c8f82f83">{"x":{"diagram":" digraph {\n\n                  graph [layout = dot, rankdir = LR]\n  \n                  # node definitions with substituted label text\n                  node [shape = rectangle, fontsize = 7, fontname = \"Montserrat\"]\n                  input [label = \"INPRES school \nconstruction \nprogram\"]\n                  output [label = \"Increased education \nof village head \ncandidates\"]\n                  outcome1 [label = \"Better reallocation \nof village \nbudgets\"]\n                  outcome2 [label = \"Efficient project \nmanagement\"]\n                  impact [label = \"Better \nprovision of \npublic goods\"]\n                  \n                  # defining the edge\n                  input -> output -> outcome1 -> impact\n                  output -> outcome2 -> impact\n                  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-e947e9a75af1c31e0962" style="width:800px;height:500px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-e947e9a75af1c31e0962">{"x":{"diagram":" digraph {\n\n                  graph [layout = dot, rankdir = LR]\n  \n                  # node definitions with substituted label text\n                  node [shape = rectangle, fontsize = 7, fontname = \"Montserrat\"]\n                  input [label = \"INPRES school \nconstruction \nprogram\"]\n                  output [label = \"Increased education \nof village head \ncandidates\"]\n                  outcome1 [label = \"Better reallocation \nof village \nbudgets\"]\n                  outcome2 [label = \"Efficient project \nmanagement\"]\n                  impact [label = \"Better \nprovision of \npublic goods\"]\n                  \n                  # defining the edge\n                  input -> output -> outcome1 -> impact\n                  output -> outcome2 -> impact\n                  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
@@ -714,8 +714,7 @@ delimiter now cr
 		g badvar = b`v'
 		
 		* running the first model : c.num_dev as the interaction variable 
-		qui eststo m1_`v' : xtreg `v' i.post92##c.num_dev##i.badvar ///
-		i.year if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		qui eststo m1_`v' : xtreg `v' i.post92##c.num_dev##i.badvar	i.year if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
 		
 		* adding baseline mean
 			qui su `v' if e(sample) == 1 
@@ -724,8 +723,7 @@ delimiter now cr
 		
 		
 		* running the second model : positive inpres dummies as the interaction variable 
-		qui eststo m2_`v' : xtreg `v' i.post92##i.inp_pos##i.badvar ///
-		i.year if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		qui eststo m2_`v' : xtreg `v' i.post92##i.inp_pos##i.badvar i.year if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
 		
 		* adding baseline mean
 			qui su `v' if e(sample) == 1 
@@ -775,9 +773,152 @@ delimiter now cr
 ---
 # Results: Robustness checks
 
+* Potential concerns: 
+
+    1. Could different village sizes explain the results?
+    
+--
+
+    2. Could villages with different pre-treatment levels have different underlying trends in public good provision?
+    
+--
+
+    3. What about the 3 variables that were found to be correlated with timing elections? 
+    
+--
+
+    4. But INPRES school allocation is not random, right? 
+    
+--
+
+    5. Are there any pre-trends?
 
 ---
-# Results: What are the effect's mechanisms?
+# Results: Robustness checks
+
+.panelset[
+
+.panel[.panel-name[Stata Code]
+.small[
+
+```stata
+  
+  /* first, we load the raw data */
+	use "$raw_data/VHeduc_Data", clear
+	
+	/* setting the panel data */
+	xtset v_id year
+	
+	/* storing the depvars in the global */
+	gl depvars dum doc safe 
+	
+	/* looping across the dependent variable and specification */
+	foreach v in $depvars {
+		
+		* spec #1: controlling for log population
+		qui eststo m1_`v': xtreg `v' i.post92##c.num_dev i.year lpopulation if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* spec #2: controlling for pre-treatment dep var x year FE
+		qui eststo m2_`v': xtreg `v' i.post92##c.num_dev i.year i.year#c.`v'_pre if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* spec #3: controlling for pre-treatment covariates 
+		qui eststo m3_`v': xtreg `v' i.post92##c.num_dev i.year i.year##c.dum_otrocop_pre i.year##c.num_bank_pre i.year##c.pedati_pre if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* spec #4: controlling for initial school enrollment and enrollment / water sanitation X year FE
+		qui eststo m4_`v': xtreg `v' i.post92##c.num_dev i.year i.year#c.sch_rate86 i.year#i.Inptoil if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* spec #5: exploring pre-trends
+		qui eststo m5_`v': xtreg `v' post92 ye_3_1_num_dev-ye_3_4_num_dev i.year if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		
+		* tabulating the results
+		estout m*, cells(b(star fmt(3)) se(par fmt(3))) modelwidth(7) stats(r2 N, fmt(%9.3f %9.0f) labels("R-squared" "Observations")) keep(1.post92 1.post92#c.num_dev ye_3_1_num_dev ye_3_2_num_dev ye_3_3_num_dev) ///
+		order(1.post92 1.post92#c.num_dev ye_3_3_num_dev ye_3_2_num_dev ye_3_1_num_dev) ///
+		varlabels(1.post92 "Post" 1.post92#c.num_dev "Post X INPRES N" ye_3_1_num_dev "3 year before X INPRES N" ye_3_2_num_dev "2 year before X INPRES N" ye_3_3_num_dev "1 year before X INPRES N")
+		
+		eststo clear 
+	}
+```
+
+]
+]
+
+.panel[.panel-name[Health Centers]
+
+```
+               m1_dum      m2_dum      m3_dum      m4_dum      m5_dum   
+                 b/se        b/se        b/se        b/se        b/se   
+------------------------------------------------------------------------
+Post           -0.005      -0.005      -0.005      -0.005               
+              (0.003)     (0.003)     (0.003)     (0.003)               
+Post X INP~N    0.012***    0.014***    0.012***    0.012***            
+              (0.003)     (0.003)     (0.003)     (0.003)               
+1 year bef~N                                                    0.005   
+                                                              (0.004)   
+2 year bef~N                                                    0.005   
+                                                              (0.004)   
+3 year bef~N                                                    0.005   
+                                                              (0.003)   
+------------------------------------------------------------------------
+R-squared       0.064       0.068       0.064       0.064       0.063   
+Observations    59130       59130       59130       59106       59130   
+------------------------------------------------------------------------
+*, ** and *** denote significance at 5%, 1%, and 0.1%.
+```
+]
+
+.panel[.panel-name[Doctors]
+
+```
+               m1_doc      m2_doc      m3_doc      m4_doc      m5_doc   
+                 b/se        b/se        b/se        b/se        b/se   
+------------------------------------------------------------------------
+Post            0.001       0.000       0.000       0.001               
+              (0.003)     (0.003)     (0.003)     (0.003)               
+Post X INP~N    0.006       0.007       0.006       0.006               
+              (0.003)     (0.004)     (0.003)     (0.003)               
+1 year bef~N                                                    0.001   
+                                                              (0.005)   
+2 year bef~N                                                    0.005   
+                                                              (0.004)   
+3 year bef~N                                                    0.006   
+                                                              (0.003)   
+------------------------------------------------------------------------
+R-squared       0.069       0.073       0.076       0.071       0.068   
+Observations    59130       59130       59130       59106       59130   
+------------------------------------------------------------------------
+*, ** and *** denote significance at 5%, 1%, and 0.1%.
+```
+
+]
+
+.panel[.panel-name[Drinking Water]
+
+```
+              m1_safe     m2_safe     m3_safe     m4_safe     m5_safe   
+                 b/se        b/se        b/se        b/se        b/se   
+------------------------------------------------------------------------
+Post           -0.005       0.000      -0.005      -0.005               
+              (0.005)     (0.004)     (0.005)     (0.005)               
+Post X INP~N    0.018*      0.013*      0.017*      0.017*              
+              (0.007)     (0.006)     (0.007)     (0.007)               
+1 year bef~N                                                    0.003   
+                                                              (0.007)   
+2 year bef~N                                                    0.001   
+                                                              (0.007)   
+3 year bef~N                                                    0.005   
+                                                              (0.004)   
+------------------------------------------------------------------------
+R-squared       0.048       0.178       0.052       0.048       0.048   
+Observations    39420       39420       39420       39404       39420   
+------------------------------------------------------------------------
+*, ** and *** denote significance at 5%, 1%, and 0.1%.
+```
+
+]
+]
+
+---
+# .medsmall[Results: What are the effect's mechanisms?]
 
 
 ---
