@@ -9,7 +9,6 @@ output:
     lib_dir: libs 
     nature: 
       countIncrementalSlides: false
-      beforeInit: "https://platform.twitter.com/widgets.js"
 
 ---
 
@@ -80,7 +79,7 @@ library(fixest)
 * There have been massive increases in school enrollment and educational attainment 
 among developing countries in the last decades
 
-<img src="indo_students.jpg" style="position:absolute; right:0; top:500px;">
+<img src="indo_students.JPG" style="position:absolute; right:0; top:500px;">
 
 --
 
@@ -121,7 +120,7 @@ DiagrammeR::grViz(" digraph {
 * **Key institutional feature**: 
 
     + INPRES program started in 1974
-    <img src="indo_students.jpg" style="position:absolute; right:0; top:550px;">
+    <img src="indo_students.JPG" style="position:absolute; right:0; top:550px;">
 --
     + Village head candidates must be at least 25 years old
 --
@@ -179,7 +178,7 @@ led to **increases in provision of key public goods**:
 ---
 # Data
 
-<img src="indo_students.jpg" style="position:absolute; right:0; top:500px;">
+<img src="indo_students.JPG" style="position:absolute; right:0; top:500px;">
 
 * Data: Village Potentials (*Potensi Desa*), merged with INPRES school data
 --
@@ -197,7 +196,7 @@ led to **increases in provision of key public goods**:
 ---
 # Methods: key institutional feature
 
-<img src="indo_students.jpg" style="position:absolute; right:0; top:500px;">
+<img src="indo_students.JPG" style="position:absolute; right:0; top:500px;">
 
 * First cohort 'treated' by INPRES schools: 7 YOs in 1974
 
@@ -220,7 +219,7 @@ led to **increases in provision of key public goods**:
 ---
 # Methods: key institutional feature
 
-<img src = 'event_timeline.jpg'>
+<img src = 'event_timeline.JPG'>
 <figcaption><i>Source: Martinez-Bravo (2017)</i></figcaption>
 
 
@@ -335,7 +334,7 @@ class: medsmall
 
 --
 
-.center[<img src="fe_meme.png" width = "200px" height="200px">]
+.center[<img src="fe_meme.PNG" width = "200px" height="200px">]
 
 
 ---
