@@ -71,8 +71,9 @@ library(tidyverse)
 library(knitr)
 library(kableExtra)
 library(Statamarkdown)
+library(stargazer)
+library(fixest)
 ```
-
 
 # What motivated the paper?
 
@@ -173,9 +174,7 @@ led to **increases in provision of key public goods**:
     + **First-stage**: INPRES school constructions induced increased in the education of village head 
     that is ultimately elected 
 --
-    + **Second-stage**: More educated village heads better reallocate their budgets 
---
-    + **Second-stage**: More educated village heads manage their projects better. 
+    + **Second-stage**: More educated village heads are better at reallocating their budgets and managing their projects 
 
 ---
 # Data
@@ -344,7 +343,11 @@ class: medsmall
 
 * Assume there are only two groups, *treated* and *controls*, and two periods, *before* and *after*
 
+--
+
 * $A$ and $C$ are FEs of the treated and control groups, while $T$ is the time FE
+
+--
 
 * $D$ is the treatment effect
 
@@ -978,9 +981,225 @@ $$
 ---
 # .medsmall[Results: What are the effect's mechanisms?]
 
+* **How could the influx of educated candidates influence public good provision?**
+
+--
+
+    1. Through changes in village head's education 
+    
+--
+      
+      + VH that ultimately gets elected is more educated
+--
+      + Equilibrium effect
+      
+--
+    2. Through changes in electorate's education
+    
+--
+      
+      + MB already mitigated this possibility by including year FE 
+--
+      + MB also controlled for average education of the electorate in each village.
+      
+---
+# .medsmall[Results: What are the effect's mechanisms?]
+
+.panelset[
+
+.panel[.panel-name[Stata Code]
+.small[
+```{stata table6_code, eval = FALSE, echo = TRUE}
+  use "$raw_data/VHeduc_Data", clear
+	
+	* panel data setup 
+	xtset v_id year
+	
+	eststo clear
+	* running model #1
+	qui eststo m1: xtreg yrsedu i.post92 i.year, fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* running model #2
+	qui eststo m2: xtreg yrsedu i.post92##c.num_dev i.year, fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* running model #3
+	qui eststo m3: xtreg yrsedu i.post92##i.inp_pos i.year, fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* running model #4
+	qui eststo m4: xtreg yrsedu i.post92##i.num_PSINPRES1980 i.year, fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* running model #5
+	qui eststo m5: xtreg yrsedu ib0.post92##ib0.young i.year, fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* running model #6
+	qui eststo m6: xtreg yrsedu ib0.post92##ib0.young##c.num_dev i.year, ///
+	fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	estout m*, cells(b(star fmt(3)) se(par fmt(3))) modelwidth(9) stats(r2 N, fmt(%9.3f %9.0f) labels("R-squared" "Observations")) ///
+		keep(1.post92 1.post92#c.num_dev 1.post92#1.inp_pos ///
+		1.post92#1.num_PSINPRES1980 1.post92#2.num_PSINPRES1980 1.post92#1.young 1.post92#1.young#c.num_dev) ///
+		order(1.post92 1.post92#c.num_dev 1.post92#1.inp_pos ///
+		1.post92#1.num_PSINPRES1980 1.post92#2.num_PSINPRES1980 1.post92#1.young 1.post92#1.young#c.num_dev)
+```
+]
+]
+
+.panel[.panel-name[Output]
+```{stata table6_output}
+  gl raw_data "C:/Users/Sean Hambali/Documents/GitHub/wb_isa_workshop/walkthrough/113664-V1/AEJApp-2015-0447_Dataset"
+  use "$raw_data/VHeduc_Data", clear
+	
+	* panel data setup 
+	qui xtset v_id year
+	
+	eststo clear
+	* running model #1
+	qui eststo m1: xtreg yrsedu i.post92 i.year, fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* running model #2
+	qui eststo m2: xtreg yrsedu i.post92##c.num_dev i.year, fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* running model #3
+	qui eststo m3: xtreg yrsedu i.post92##i.inp_pos i.year, fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* running model #4
+	qui eststo m4: xtreg yrsedu i.post92##i.num_PSINPRES1980 i.year, fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* running model #5
+	qui eststo m5: xtreg yrsedu ib0.post92##ib0.young i.year, fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* running model #6
+	qui eststo m6: xtreg yrsedu ib0.post92##ib0.young##c.num_dev i.year, ///
+	fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	estout m*, cells(b(star fmt(3)) se(par fmt(3))) modelwidth(7) ///
+		stats(r2 N, fmt(%9.3f %9.0f) labels("R-squared" "Observations")) ///
+		keep(1.post92 1.post92#c.num_dev 1.post92#1.inp_pos ///
+		1.post92#1.num_PSINPRES1980 1.post92#2.num_PSINPRES1980 1.post92#1.young 1.post92#1.young#c.num_dev) ///
+		order(1.post92 1.post92#c.num_dev 1.post92#1.inp_pos ///
+		1.post92#1.num_PSINPRES1980 1.post92#2.num_PSINPRES1980 1.post92#1.young 1.post92#1.young#c.num_dev)
+
+```
+]
+]
+
 
 ---
-# Discussion and Conclusion
+# .medsmall[Results: What are the effect's mechanisms?]
 
+* **How does increased VH education affect public goods provision?**
 
+--
+
+    1. Obtaining more funds from upper levels of government
+
+--
+    2. Reallocation of village expenditures towards development projects
+--
+    3. More efficient funds use and project management 
+
+--
+
+* MB estimated the following cross-sectional specification using OLS and 2SLS: 
+
+  $$Y_{vp} = \beta_0 + \beta_1 educ_v + \gamma_p + \boldsymbol X_{vp} ' \boldsymbol \delta + \epsilon_{vp}$$
+* MB finds that the more educated VH:
+
+--
+
+    + Have higher village revenues, mainly through income within the village—not from central government
+
+--
+    + Allocate more budget on infrastructure, goods expenses, and social facilities.
+
+---
+# .medsmall[Results: What are the effect's mechanisms?]
+
+.panelset[
+
+.panel[.panel-name[Stata Code]
+.small[
+```{stata table7_code, eval = FALSE, echo = TRUE}
+  use "$raw_data/projectData", clear	
+	
+	duplicates drop v_id, force
+		
+	* storing the relevant variables in global
+	gl depvar numproj num_Vmanag  numproj_vil numproj_Inpres numproj_gov
+	
+	eststo clear 
+	* looping across the depvars 
+	foreach v in $depvar {
+		
+		* the OLS model
+		qui eststo M_`v'_ols: reg `v' yrsedu i.idprop lpop* percrurHH percrurHH2-percrurHH4, cluster(idkab_num)
+		
+		* the 2SLS model 
+		qui eststo M_`v'_iv: ivreg2 `v' i.idprop lpop* percrurHH percrurHH2-percrurHH4 (yrsedu = avg_educinkec), cluster(idkab_num)
+		
+	}
+	
+	* Now, we use the project-level data 
+	use "$raw_data/projectData", clear 
+	
+	* the OLS model
+	* without project completion and type controls
+	qui eststo M_projdur1_ols : qui reg projdur yrsedu i.idprop lpop* percrurHH percrurHH2-percrurHH4, cluster(idkab_num)
+	
+	* with controls
+	qui eststo M_projdur2_ols : qui reg projdur yrsedu i.idprop i.typeproj#i.projperct_round lpop* percrurHH percrurHH2-percrurHH4 , cluster(idkab_num)
+	
+	* IV model, similar specs 
+	qui eststo M_projdur1_iv : qui ivreg2 projdur yrsedu i.idprop  lpop* percrurHH percrurHH2-percrurHH4 (yrsedu = avg_educinkec), cluster(idkab_num)
+	qui eststo M_projdur2_iv : qui ivreg2 projdur i.idprop i.typeproj#i.projperct_round  lpop*  percrurHH percrurHH2-percrurHH4 (yrsedu = avg_educinkec) , cluster(idkab_num)
+	
+	* tabulating the results 
+	estout M*ols, cells(b(star fmt(3)) se(par fmt(3))) keep(yrsedu) note(*, ** and *** denote significance at 5%, 1%, and 0.1%.)
+	
+	estout M*iv, cells(b(star fmt(3)) se(par fmt(3))) keep(yrsedu) note(*, ** and *** denote significance at 5%, 1%, and 0.1%.)
+```
+]
+]
+
+.panel[.panel-name[Table]
+```{r table7_output}
+table7 <- tribble(
+  ~estimation_method,   ~col1,     ~col2,     ~col3,     ~col4,     ~col5,    ~col6,        ~col7, 
+  "OLS",                "0.015",   "0.026*",  "0.025*",  "-0.013",  "0.004",   "-0.040***", "-0.036***",
+  "",                   "(0.013)", "(0.012)", "(0.012)", "(0.006)", "(0.006)", "(0.013)",   "(0.013)",
+  "",                   "",        "",        "",        "",        "",        "",          "",
+  "2SLS",               "0.169",   "0.213",   "0.238*",  "-0.094",  "0.042",   "-0.040**",  "-0.175*", 
+  "",                   "(0.108)", "(0.095)", "(0.107)", "(0.060)", "(0.052)", "(0.013)",   "(0.069)"
+)
+
+knitr::kable(table7, format = 'html', 
+      col.names = c('Method', 'Number of projects', 'Number of projects managed by village', 
+                    'Funding: villagers', 'Funding: central gov. grants', 
+                    'Funding: central gov. budget allocation', 'Project duration', 
+                    'Project duration (controlling for completion and type)')) %>% 
+  kable_styling(font_size = 11) %>% 
+  row_spec(0 ,  bold = F, extra_css = 'vertical-align: top !important;')
+```
+
+]
+]
+
+---
+# Conclusion
+
+* Public goods provision increased significantly after the first election 
+where INPRES cohorts could run as candidates 
+
+--
+
+* How? 
+
+--
+
+    + More educated VH get elected
+--
+    + Shift in political equilibrium 
+--
+
+* More educated VH allocate more funds towards development projects, and manage them efficiently
 

@@ -451,26 +451,123 @@ graph export "$walkthrough/fig2.png", replace
 	foreach v in $depvars {
 		
 		* spec #1: controlling for log population
-		qui eststo m1_`v': xtreg `v' i.post92##c.num_dev i.year lpopulation if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		qui eststo m1_`v': xtreg `v' i.post92##c.num_dev i.year ///
+		lpopulation if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
 		
 		* spec #2: controlling for pre-treatment dep var x year FE
-		qui eststo m2_`v': xtreg `v' i.post92##c.num_dev i.year i.year#c.`v'_pre if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		qui eststo m2_`v': xtreg `v' i.post92##c.num_dev i.year ///
+		i.year#c.`v'_pre if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
 		
 		* spec #3: controlling for pre-treatment covariates 
-		qui eststo m3_`v': xtreg `v' i.post92##c.num_dev i.year i.year##c.dum_otrocop_pre i.year##c.num_bank_pre i.year##c.pedati_pre if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		qui eststo m3_`v': xtreg `v' i.post92##c.num_dev i.year ///
+		i.year##c.dum_otrocop_pre i.year##c.num_bank_pre i.year##c.pedati_pre ///
+		if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
 		
 		* spec #4: controlling for initial school enrollment and enrollment / water sanitation X year FE
-		qui eststo m4_`v': xtreg `v' i.post92##c.num_dev i.year i.year#c.sch_rate86 i.year#i.Inptoil if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		qui eststo m4_`v': xtreg `v' i.post92##c.num_dev i.year ///
+		i.year#c.sch_rate86 i.year#i.Inptoil if !mi(`v'), fe i(v_id) ///
+		vce(cluster idkab_num) dfadj
 		
 		* spec #5: 
-		qui eststo m5_`v': xtreg `v' post92 ye_3_1_num_dev-ye_3_4_num_dev i.year if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
+		qui eststo m5_`v': xtreg `v' post92 ye_3_1_num_dev-ye_3_4_num_dev ///
+		i.year if !mi(`v'), fe i(v_id) vce(cluster idkab_num) dfadj
 		
 		* estout 
-		estout m*, cells(b(star fmt(3)) se(par fmt(3))) modelwidth(7) stats(r2 N, fmt(%9.3f %9.0f) labels("R-squared" "Observations")) keep(1.post92 1.post92#c.num_dev ye_3_1_num_dev ye_3_2_num_dev ye_3_3_num_dev) order(1.post92 1.post92#c.num_dev ye_3_3_num_dev ye_3_2_num_dev ye_3_1_num_dev) varlabels(1.post92 "Post" 1.post92#c.num_dev "Post X INPRES N" ye_3_1_num_dev "3 year before X INPRES N" ye_3_2_num_dev "2 year before X INPRES N" ye_3_3_num_dev "1 year before X INPRES N")
+		estout m*, cells(b(star fmt(3)) se(par fmt(3))) modelwidth(7) ///
+		stats(r2 N, fmt(%9.3f %9.0f) labels("R-squared" "Observations")) ///
+		keep(1.post92 1.post92#c.num_dev ye_3_1_num_dev ye_3_2_num_dev ye_3_3_num_dev) ///
+		order(1.post92 1.post92#c.num_dev ye_3_3_num_dev ye_3_2_num_dev ye_3_1_num_dev) ///
+		varlabels(1.post92 "Post" 1.post92#c.num_dev "Post X INPRES N" ///
+		ye_3_1_num_dev "3 year before X INPRES N" ye_3_2_num_dev "2 year before X INPRES N" ///
+		ye_3_3_num_dev "1 year before X INPRES N")
 		
 		eststo clear 
 	}
 	
 	
 	
+/*
+	================================
+	TABLE 6. First stage regressions
+	================================
+*/	
+	
+	use "$raw_data/VHeduc_Data", clear
+	
+	* panel data setup 
+	xtset v_id year
+	
+	eststo clear
+	* running model #1
+	qui eststo m1: xtreg yrsedu i.post92 i.year, fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* running model #2
+	qui eststo m2: xtreg yrsedu i.post92##c.num_dev i.year, fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* running model #3
+	qui eststo m3: xtreg yrsedu i.post92##i.inp_pos i.year, fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* running model #4
+	qui eststo m4: xtreg yrsedu i.post92##i.num_PSINPRES1980 i.year, fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* running model #5
+	qui eststo m5: xtreg yrsedu ib0.post92##ib0.young i.year, fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* running model #6
+	qui eststo m6: xtreg yrsedu ib0.post92##ib0.young##c.num_dev i.year, ///
+	fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	estout m*, cells(b(star fmt(3)) se(par fmt(3))) modelwidth(9) ///
+		stats(r2 N, fmt(%9.3f %9.0f) labels("R-squared" "Observations")) ///
+		keep(1.post92 1.post92#c.num_dev 1.post92#1.inp_pos ///
+		1.post92#1.num_PSINPRES1980 1.post92#2.num_PSINPRES1980 1.post92#1.young 1.post92#1.young#c.num_dev) ///
+		order(1.post92 1.post92#c.num_dev 1.post92#1.inp_pos ///
+		1.post92#1.num_PSINPRES1980 1.post92#2.num_PSINPRES1980 1.post92#1.young 1.post92#1.young#c.num_dev)
+		
+		
+/*
+	=============================
+	TABLE 7. Development Projects
+	=============================
+*/		
+		
+	use "$raw_data/projectData", clear	
+	
+	duplicates drop v_id, force
+		
+	* storing the relevant variables in global
+	gl depvar numproj num_Vmanag  numproj_vil numproj_Inpres numproj_gov
+	
+	eststo clear 
+	* looping across the depvars 
+	foreach v in $depvar {
+		
+		* the OLS model
+		qui eststo M_`v'_ols: reg `v' yrsedu i.idprop lpop* percrurHH percrurHH2-percrurHH4, cluster(idkab_num)
+		
+		* the 2SLS model 
+		qui eststo M_`v'_iv: ivreg2 `v' i.idprop lpop* percrurHH percrurHH2-percrurHH4 (yrsedu = avg_educinkec), cluster(idkab_num)
+		
+	}
+	
+	* Now, we use the project-level data 
+	use "$raw_data/projectData", clear 
+	
+	* the OLS model
+	* without project completion and type controls
+	qui eststo M_projdur1_ols : qui reg projdur yrsedu i.idprop lpop* percrurHH percrurHH2-percrurHH4, cluster(idkab_num)
+	
+	* with controls
+	qui eststo M_projdur2_ols : qui reg projdur yrsedu i.idprop i.typeproj#i.projperct_round lpop* percrurHH percrurHH2-percrurHH4 , cluster(idkab_num)
+	
+	* IV model, similar specs 
+	qui eststo M_projdur1_iv : qui ivreg2 projdur yrsedu i.idprop  lpop* percrurHH percrurHH2-percrurHH4 (yrsedu = avg_educinkec), cluster(idkab_num)
+	qui eststo M_projdur2_iv : qui ivreg2 projdur i.idprop i.typeproj#i.projperct_round  lpop*  percrurHH percrurHH2-percrurHH4 (yrsedu = avg_educinkec) , cluster(idkab_num)
+	
+	* tabulating the results 
+	estout M*ols, cells(b(star fmt(3)) se(par fmt(3))) keep(yrsedu) ///
+	note(*, ** and *** denote significance at 5%, 1%, and 0.1%.)
+	
+	estout M*iv, cells(b(star fmt(3)) se(par fmt(3))) keep(yrsedu) ///
+	note(*, ** and *** denote significance at 5%, 1%, and 0.1%.)
 	

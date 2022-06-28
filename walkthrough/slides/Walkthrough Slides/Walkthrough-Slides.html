@@ -4,7 +4,7 @@
     <title>The Local Political Economy Effects of School Construction in Indonesia</title>
     <meta charset="utf-8" />
     <meta name="author" content="Originally by Martinez-Bravo (2017)" />
-    <meta name="date" content="2022-06-27" />
+    <meta name="date" content="2022-06-28" />
     <script src="libs/header-attrs-2.14/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
@@ -32,7 +32,7 @@ class: center, middle, inverse, title-slide
 ### Originally by Martinez-Bravo (2017)
 ]
 .date[
-### 27 June 2022
+### 28 June 2022
 ]
 
 ---
@@ -80,7 +80,6 @@ class: center, middle, inverse, title-slide
 
 
 
-
 # What motivated the paper?
 
 * There have been massive increases in school enrollment and educational attainment 
@@ -100,8 +99,8 @@ in Indonesia (the INPRES program) on **village governance and public good provis
 ---
 # The author's hypothesis
 
-<div id="htmlwidget-e947e9a75af1c31e0962" style="width:800px;height:500px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-e947e9a75af1c31e0962">{"x":{"diagram":" digraph {\n\n                  graph [layout = dot, rankdir = LR]\n  \n                  # node definitions with substituted label text\n                  node [shape = rectangle, fontsize = 7, fontname = \"Montserrat\"]\n                  input [label = \"INPRES school \nconstruction \nprogram\"]\n                  output [label = \"Increased education \nof village head \ncandidates\"]\n                  outcome1 [label = \"Better reallocation \nof village \nbudgets\"]\n                  outcome2 [label = \"Efficient project \nmanagement\"]\n                  impact [label = \"Better \nprovision of \npublic goods\"]\n                  \n                  # defining the edge\n                  input -> output -> outcome1 -> impact\n                  output -> outcome2 -> impact\n                  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-32c403a26da1d3c62a08" style="width:800px;height:500px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-32c403a26da1d3c62a08">{"x":{"diagram":" digraph {\n\n                  graph [layout = dot, rankdir = LR]\n  \n                  # node definitions with substituted label text\n                  node [shape = rectangle, fontsize = 7, fontname = \"Montserrat\"]\n                  input [label = \"INPRES school \nconstruction \nprogram\"]\n                  output [label = \"Increased education \nof village head \ncandidates\"]\n                  outcome1 [label = \"Better reallocation \nof village \nbudgets\"]\n                  outcome2 [label = \"Efficient project \nmanagement\"]\n                  impact [label = \"Better \nprovision of \npublic goods\"]\n                  \n                  # defining the edge\n                  input -> output -> outcome1 -> impact\n                  output -> outcome2 -> impact\n                  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
@@ -920,11 +919,266 @@ Observations    39420       39420       39420       39404       39420
 ---
 # .medsmall[Results: What are the effect's mechanisms?]
 
+* **How could the influx of educated candidates influence public good provision?**
+
+--
+
+    1. Through changes in village head's education 
+    
+--
+      
+      + VH that ultimately gets elected is more educated
+--
+      + Equilibrium effect
+      
+--
+    2. Through changes in electorate's education
+    
+--
+      
+      + MB already mitigated this possibility by including year FE 
+--
+      + MB also controlled for average education of the electorate in each village.
+      
+---
+# .medsmall[Results: What are the effect's mechanisms?]
+
+.panelset[
+
+.panel[.panel-name[Stata Code]
+.small[
+
+```stata
+  use "$raw_data/VHeduc_Data", clear
+	
+	* panel data setup 
+	xtset v_id year
+	
+	eststo clear
+	* running model #1
+	qui eststo m1: xtreg yrsedu i.post92 i.year, fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* running model #2
+	qui eststo m2: xtreg yrsedu i.post92##c.num_dev i.year, fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* running model #3
+	qui eststo m3: xtreg yrsedu i.post92##i.inp_pos i.year, fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* running model #4
+	qui eststo m4: xtreg yrsedu i.post92##i.num_PSINPRES1980 i.year, fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* running model #5
+	qui eststo m5: xtreg yrsedu ib0.post92##ib0.young i.year, fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	* running model #6
+	qui eststo m6: xtreg yrsedu ib0.post92##ib0.young##c.num_dev i.year, ///
+	fe i(v_id) vce(cluster idkab_num) dfadj
+	
+	estout m*, cells(b(star fmt(3)) se(par fmt(3))) modelwidth(9) stats(r2 N, fmt(%9.3f %9.0f) labels("R-squared" "Observations")) ///
+		keep(1.post92 1.post92#c.num_dev 1.post92#1.inp_pos ///
+		1.post92#1.num_PSINPRES1980 1.post92#2.num_PSINPRES1980 1.post92#1.young 1.post92#1.young#c.num_dev) ///
+		order(1.post92 1.post92#c.num_dev 1.post92#1.inp_pos ///
+		1.post92#1.num_PSINPRES1980 1.post92#2.num_PSINPRES1980 1.post92#1.young 1.post92#1.young#c.num_dev)
+```
+]
+]
+
+.panel[.panel-name[Output]
+
+```
+                  m1         m2         m3         m4         m5         m6   
+                b/se       b/se       b/se       b/se       b/se       b/se   
+------------------------------------------------------------------------------
+1.post92       0.433***   0.429***   0.367***   0.364***   0.299**    0.294** 
+             (0.089)    (0.088)    (0.087)    (0.087)    (0.092)    (0.090)   
+1.post92#c~v              0.110                                       0.113   
+                        (0.057)                                     (0.062)   
+1.post92#1~s                         0.095                                    
+                                   (0.075)                                    
+1.post9~1980                                    0.029                         
+                                              (0.076)                         
+1.post9~1980                                    0.238*                        
+                                              (0.119)                         
+1.post92#1~g                                               1.125***   1.129***
+                                                         (0.126)    (0.125)   
+1.post92#1~v                                                          0.035   
+                                                                    (0.118)   
+------------------------------------------------------------------------------
+R-squared      0.221      0.222      0.221      0.222      0.229      0.229   
+Observations   59130      59130      59130      59130      59105      59105   
+------------------------------------------------------------------------------
+```
+]
+]
+
 
 ---
-# Discussion and Conclusion
+# .medsmall[Results: What are the effect's mechanisms?]
 
+* **How does increased VH education affect public goods provision?**
 
+--
+
+    1. Obtaining more funds from upper levels of government
+
+--
+    2. Reallocation of village expenditures towards development projects
+--
+    3. More efficient funds use and project management 
+
+--
+
+* MB estimated the following cross-sectional specification using OLS and 2SLS: 
+
+  `$$Y_{vp} = \beta_0 + \beta_1 educ_v + \gamma_p + \boldsymbol X_{vp} ' \boldsymbol \delta + \epsilon_{vp}$$`
+* MB finds that the more educated VH:
+
+--
+
+    + Have higher village revenues, mainly through income within the village—not from central government
+
+--
+    + Allocate more budget on infrastructure, goods expenses, and social facilities.
+
+---
+# .medsmall[Results: What are the effect's mechanisms?]
+
+.panelset[
+
+.panel[.panel-name[Stata Code]
+.small[
+
+```stata
+  use "$raw_data/projectData", clear	
+	
+	duplicates drop v_id, force
+		
+	* storing the relevant variables in global
+	gl depvar numproj num_Vmanag  numproj_vil numproj_Inpres numproj_gov
+	
+	eststo clear 
+	* looping across the depvars 
+	foreach v in $depvar {
+		
+		* the OLS model
+		qui eststo M_`v'_ols: reg `v' yrsedu i.idprop lpop* percrurHH percrurHH2-percrurHH4, cluster(idkab_num)
+		
+		* the 2SLS model 
+		qui eststo M_`v'_iv: ivreg2 `v' i.idprop lpop* percrurHH percrurHH2-percrurHH4 (yrsedu = avg_educinkec), cluster(idkab_num)
+		
+	}
+	
+	* Now, we use the project-level data 
+	use "$raw_data/projectData", clear 
+	
+	* the OLS model
+	* without project completion and type controls
+	qui eststo M_projdur1_ols : qui reg projdur yrsedu i.idprop lpop* percrurHH percrurHH2-percrurHH4, cluster(idkab_num)
+	
+	* with controls
+	qui eststo M_projdur2_ols : qui reg projdur yrsedu i.idprop i.typeproj#i.projperct_round lpop* percrurHH percrurHH2-percrurHH4 , cluster(idkab_num)
+	
+	* IV model, similar specs 
+	qui eststo M_projdur1_iv : qui ivreg2 projdur yrsedu i.idprop  lpop* percrurHH percrurHH2-percrurHH4 (yrsedu = avg_educinkec), cluster(idkab_num)
+	qui eststo M_projdur2_iv : qui ivreg2 projdur i.idprop i.typeproj#i.projperct_round  lpop*  percrurHH percrurHH2-percrurHH4 (yrsedu = avg_educinkec) , cluster(idkab_num)
+	
+	* tabulating the results 
+	estout M*ols, cells(b(star fmt(3)) se(par fmt(3))) keep(yrsedu) note(*, ** and *** denote significance at 5%, 1%, and 0.1%.)
+	
+	estout M*iv, cells(b(star fmt(3)) se(par fmt(3))) keep(yrsedu) note(*, ** and *** denote significance at 5%, 1%, and 0.1%.)
+```
+]
+]
+
+.panel[.panel-name[Table]
+&lt;table class="table" style="font-size: 11px; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;vertical-align: top !important;"&gt; Method &lt;/th&gt;
+   &lt;th style="text-align:left;vertical-align: top !important;"&gt; Number of projects &lt;/th&gt;
+   &lt;th style="text-align:left;vertical-align: top !important;"&gt; Number of projects managed by village &lt;/th&gt;
+   &lt;th style="text-align:left;vertical-align: top !important;"&gt; Funding: villagers &lt;/th&gt;
+   &lt;th style="text-align:left;vertical-align: top !important;"&gt; Funding: central gov. grants &lt;/th&gt;
+   &lt;th style="text-align:left;vertical-align: top !important;"&gt; Funding: central gov. budget allocation &lt;/th&gt;
+   &lt;th style="text-align:left;vertical-align: top !important;"&gt; Project duration &lt;/th&gt;
+   &lt;th style="text-align:left;vertical-align: top !important;"&gt; Project duration (controlling for completion and type) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; OLS &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.015 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.026* &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.025* &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -0.013 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.004 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -0.040*** &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -0.036*** &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; (0.013) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; (0.012) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; (0.012) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; (0.006) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; (0.006) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; (0.013) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; (0.013) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2SLS &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.169 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.213 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.238* &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -0.094 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.042 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -0.040** &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -0.175* &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; (0.108) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; (0.095) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; (0.107) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; (0.060) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; (0.052) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; (0.013) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; (0.069) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+]
+]
+
+---
+# Conclusion
+
+* Public goods provision increased significantly after the first election 
+where INPRES cohorts could run as candidates 
+
+--
+
+* How? 
+
+--
+
+    + More educated VH get elected
+--
+    + Shift in political equilibrium 
+--
+
+* More educated VH allocate more funds towards development projects, and manage them efficiently
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
