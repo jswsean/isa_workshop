@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Introduction to Difference-in-differences</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Sean Hambali" />
+    <meta name="date" content="2022-06-30" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
+    <script src="libs/kePrint/kePrint.js"></script>
+    <link href="libs/lightable/lightable.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Introduction to Difference-in-differences
+]
+.author[
+### Sean Hambali
+]
+.date[
+### 30 June 2022
+]
+
+---
+
+
+
+
+# How did it begin?
+
+???
+* The earliest implementation of differences-in-differences dated way back to the 19th century,
+as John Snow—a physician at that time—attempted to investigate the Cholera outbreak in London
+
+* His basic question was, what caused the Cholera outbreak at that time? 
+
+* One theory that was prevalent at that time was the Miasma theory, which stipulated 
+that diseases will be spread by microscopic poisonous particles through the air. 
+
+* However, the puzzles don't seem to fit with this theory. Multiple things have been
+tried out to prevent airborne infections: covering the sick with burlap bags, etc., but
+the infection still spread 
+
+* So Snow developed a novel theory. He thinks that the disease is spread through living organisms, 
+such as food and drink. The microorganism entered human's body through food and drink, 
+and came out of the body, and passed into England's water supply. 
+
+* People unknowingly drank water from the Thames river, causing them to contract Cholera. 
+
+* But then, how could Snow validate his hypothesis? 
+
+* In an ideal world, he would flip a coin, and assign people to drink from the contaminated Thames 
+water, and others to drink from the uncontaminated water. However, that would be costly and unfeasible. 
+
+* So he relied on a natural experiment. In his paper, he analyzes the prevalence of cholera 
+using data from 1849-1854. 
+
+* Originally, water companies served Londoners using the downstream Thames water, which contained pollution
+via runoffs. 
+
+* However, in 1852, the parliament mandated a water company named Lambeth to move their water supply 
+upstream. This gave the company access to clean water sources.
+--
+
+* Implementation goes way back to 19th century : &lt;br&gt;John Snow and the Cholera study
+
+.center[&lt;img src='john_snow.PNG' width='250px' height='300px' style="position:absolute; left:625px; top:150px;"&gt;]
+
+--
+
+* What caused cholera?
+
+--
+
+    + Miasma?
+--
+    + Snow's theory: living organisms
+
+--
+
+* People could be contaminated from the Thames &lt;br&gt;river!
+
+--
+
+* But how could Snow confirm his hypothesis?
+
+--
+
+* *Natural experiment*:
+
+--
+
+    + His analysis is between 1849-1854
+--
+    
+    + Water companies originally supplied water from the contaminated Thames river
+--
+    
+    + In 1852, Lambeth was required by the parliament to move upstream
+
+---
+# The original design
+
+???
+* In Snow's original design, the treated group is Lambeth
+
+* Meanwhile, the Southwark and Vauxhall water company is chosen as control group. 
+
+* Snow went to a great length to document the similarities between the two 
+companies. Sometimes their service would irregularly cut between neighbourhoods,
+such that houses on either side were similar to each other.
+
+* The ATT would be -78 in the table.
+--
+
+ Let:
+
++ **Lambeth** (*L*) be the treated group
+    
++ **Southwark and Vauxhall** (*SV*) be the control group
+
++ `\(C\)` denote the Cholera incidence at each water company
+
++ 1849 and 1854 denote pre-treatment `\(T_0\)` and post-treatment `\(T_1\)` period.
+
+--
+
+Average treatment effect (ATT, to be precise) would be:
+
+  `$$\hat{ATT} = (C_{L, T_1} - C_{L, T_0}) - (C_{SV, T_1} - C_{SV, T_0})$$`
+
+--
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Company &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; `\(T_0\)` &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; `\(T_1\)` &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Difference &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; SV &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 135 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 147 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; L &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 85 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -66 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; `\(L-SV\)` &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -128 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -78 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+# The original design, visualized
+
+
+
+.center[
+![](did_intro_files/figure-html/lambeth_viz-1.png)&lt;!-- --&gt;
+]
+
+---
+# More formally, ...
+
+ Let: 
+
+* `\(T\)` and `\(C\)` be treated and control groups.
+
+* `\(post\)` and `\(pre\)` denote post- and pre-treatment periods.
+
+We're interested in `\(\hat{\delta}_{TC}\)`—the ATT of `\(T\)`.
+
+--
+
+  `$$\hat{\delta}_{TC} = (\bar{y}^{post}_{T} - \bar{y}^{pre}_{T}) - (\bar{y}^{post}_{C} - \bar{y}^{pre}_{C})$$`
+
+---
+# More formally, ...
+
+Rewriting the `\(ATT\)` in terms of conditional expectation: 
+
+  `$$\hat{\delta}_{TC} = (E[Y_T | POST] - E[Y_T | PRE])-(E[Y_C | POST] - E[Y_C | PRE])$$`
+
+--
+ 
+&lt;br&gt;
+We substitute the above with **switching equation** terms:
+
+  `$$\hat{\delta}_{TC} = (E[Y^1_T | POST] - E[Y^0_T | PRE])-(E[Y^0_C | POST] - E[Y^0_C | PRE])$$`
+
+--
+ 
+&lt;br&gt;
+and adding zero to the right-hand side:
+
+$$
+`\begin{aligned}
+\hat{\delta}_{TC} = &amp; \underbrace{(E[Y^1_T | POST] - E[Y^0_T | PRE])-(E[Y^0_C | POST] - E[Y^0_C | PRE])}_{\text{Switching Equation}} + \\
+                 &amp; \underbrace{E[Y^0_T | POST] - E[Y^0_T | POST]}_{\text{Zero term}}
+\end{aligned}`
+$$
+
+---
+# More formally, ...
+
+Re-arranging the terms: 
+
+$$
+`\begin{aligned}
+\hat{\delta}_{TC} = &amp; \underbrace{(E[Y^1_T | POST] - E[Y^0_T | POST])}_{ATT} + \\
+                 &amp; \underbrace{(E[Y^0_T | POST] - E[Y^0_T | PRE]) - (E[Y^0_C | POST] - E[Y^0_C | PRE])}_{\text{Non-parallel trend bias}}
+\end{aligned}`
+$$
+
+--
+
+.center[&lt;img src='john_lennon_meme.PNG' width='250px' height='250px' style="position:absolute; left:625px; top:375px;"&gt;]
+
+
+--
+
+Imagine a world without your treatment: 
+
+* Would your `\(T\)` and `\(C\)` have evolved differently? 
+
+* If not, why?
+
+* Parallel trend assumption simply means your &lt;br&gt;
+your `\(T\)` and `\(C\)` would have moved similarly&lt;br&gt;
+in the absence of treatment. 
+
+---
+# The original design, revisited
+
+.pull-left[
+![](did_intro_files/figure-html/lambeth_viz_revisited-1.png)&lt;!-- --&gt;
+]
+
+--
+
+.pull-right[
+![](did_intro_files/figure-html/lambeth_viz_unparallel-1.png)&lt;!-- --&gt;
+
+]
+
+---
+# Before we go...
+
+Please remember that **parallel trends** cannot really be verified.
+
+--
+
+Some basic DiD extensions: 
+
+--
+
+* Multiple pre- and post-treatment periods
+
+--
+
+* Event study difference-in-differences
+
+.center[&lt;img src='es_employed_dummy.PNG' width='400px' height='300px' style="position:absolute; left:450px; top:340px;"&gt;]
+
+--
+
+* Staggered timing roll-out 
+
+--
+
+* Continuous treatment
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

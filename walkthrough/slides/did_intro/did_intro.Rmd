@@ -1,0 +1,326 @@
+---
+title: "Introduction to Difference-in-differences"
+author: "Sean Hambali"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+output: 
+  xaringan::moon_reader:
+    lib_dir: libs 
+    nature: 
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
+library(tidyverse)
+library(ggbrace)
+library(knitr)
+library(kableExtra)
+```
+
+# How did it begin?
+
+???
+* The earliest implementation of differences-in-differences dated way back to the 19th century,
+as John Snow—a physician at that time—attempted to investigate the Cholera outbreak in London
+
+* His basic question was, what caused the Cholera outbreak at that time? 
+
+* One theory that was prevalent at that time was the Miasma theory, which stipulated 
+that diseases will be spread by microscopic poisonous particles through the air. 
+
+* However, the puzzles don't seem to fit with this theory. Multiple things have been
+tried out to prevent airborne infections: covering the sick with burlap bags, etc., but
+the infection still spread 
+
+* So Snow developed a novel theory. He thinks that the disease is spread through living organisms, 
+such as food and drink. The microorganism entered human's body through food and drink, 
+and came out of the body, and passed into England's water supply. 
+
+* People unknowingly drank water from the Thames river, causing them to contract Cholera. 
+
+* But then, how could Snow validate his hypothesis? 
+
+* In an ideal world, he would flip a coin, and assign people to drink from the contaminated Thames 
+water, and others to drink from the uncontaminated water. However, that would be costly and unfeasible. 
+
+* So he relied on a natural experiment. In his paper, he analyzes the prevalence of cholera 
+using data from 1849-1854. 
+
+* Originally, water companies served Londoners using the downstream Thames water, which contained pollution
+via runoffs. 
+
+* However, in 1852, the parliament mandated a water company named Lambeth to move their water supply 
+upstream. This gave the company access to clean water sources.
+--
+
+* Implementation goes way back to 19th century : <br>John Snow and the Cholera study
+
+.center[<img src='john_snow.PNG' width='250px' height='300px' style="position:absolute; left:625px; top:150px;">]
+
+--
+
+* What caused cholera?
+
+--
+
+    + Miasma?
+--
+    + Snow's theory: living organisms
+
+--
+
+* People could be contaminated from the Thames <br>river!
+
+--
+
+* But how could Snow confirm his hypothesis?
+
+--
+
+* *Natural experiment*:
+
+--
+
+    + His analysis is between 1849-1854
+--
+    
+    + Water companies originally supplied water from the contaminated Thames river
+--
+    
+    + In 1852, Lambeth was required by the parliament to move upstream
+
+---
+# The original design
+
+???
+* In Snow's original design, the treated group is Lambeth
+
+* Meanwhile, the Southwark and Vauxhall water company is chosen as control group. 
+
+* Snow went to a great length to document the similarities between the two 
+companies. Sometimes their service would irregularly cut between neighbourhoods,
+such that houses on either side were similar to each other.
+
+* The ATT would be -78 in the table.
+--
+
+ Let:
+
++ **Lambeth** (*L*) be the treated group
+    
++ **Southwark and Vauxhall** (*SV*) be the control group
+
++ $C$ denote the Cholera incidence at each water company
+
++ 1849 and 1854 denote pre-treatment $T_0$ and post-treatment $T_1$ period.
+
+--
+
+Average treatment effect (ATT, to be precise) would be:
+
+  $$\hat{ATT} = (C_{L, T_1} - C_{L, T_0}) - (C_{SV, T_1} - C_{SV, T_0})$$
+
+--
+
+```{r lambeth_table}
+lambeth_table <- tribble(
+  ~Company,         ~`$T_0$`, ~`$T_1$`, ~Difference, 
+  'SV',             135,     147,    12,      
+  'L',              85,      19,     -66, 
+  '$L-SV$',         -50,    -128,    -78
+)
+
+kable(lambeth_table) %>% 
+  kable_styling()
+
+```
+
+---
+# The original design, visualized
+
+```{r lambeth_data_prep, cache=TRUE}
+lambeth_table2 <- tribble(
+  ~company, ~period, ~cholera_incidence, ~group,
+  'SV', 1, 135, 'Control',
+  'SV', 2, 147, 'Control',
+  'L_C', 1, 85, 'Counterfactual',
+  'L_C', 2, (85*(1+((147-135)/135))), 'Counterfactual',
+  'L', 1, 85, 'Treatment',
+  'L', 2, 19, 'Treatment', 
+) %>% 
+  mutate(period = factor(period, levels = c(1,2), labels = c('Before', 'After')))
+
+# separating the actual and counterfactual
+lambeth_actual <- filter(lambeth_table2, group != 'Counterfactual')
+lambeth_counterfactual <- filter(lambeth_table2, group == 'Counterfactual')
+```
+
+.center[
+```{r lambeth_viz, dependson='lambeth_data_prep'}
+
+ggplot(lambeth_actual, aes(x = period, y = cholera_incidence)) +
+  geom_point(data = lambeth_counterfactual, size = 5, alpha = 1/3) +
+  geom_line(data = lambeth_counterfactual, 
+            mapping = aes(group = group),
+            linetype = 'dashed') +
+  geom_point(aes(color = group), size = 5) + 
+  geom_line(aes(group = company, color = group)) +
+  geom_text(x = 2.25, y = 100, label = 'Counterfactual') +
+  theme_bw() +
+  ylab('Cholera incidence per 10,000 households') + 
+  xlab('Period') +
+  labs(title = "John Snow's cholera hypothesis") +
+  geom_vline(xintercept = 1.5) +
+  geom_brace(aes(c(2.05,2.2), c(19, 90), label = '\U03B4 (ATT)'), 
+             inherit.data = F, rotate = 90, labelsize = 5)
+
+```
+]
+
+---
+# More formally, ...
+
+ Let: 
+
+* $T$ and $C$ be treated and control groups.
+
+* $post$ and $pre$ denote post- and pre-treatment periods.
+
+We're interested in $\hat{\delta}_{TC}$—the ATT of $T$.
+
+--
+
+  $$\hat{\delta}_{TC} = (\bar{y}^{post}_{T} - \bar{y}^{pre}_{T}) - (\bar{y}^{post}_{C} - \bar{y}^{pre}_{C})$$
+
+---
+# More formally, ...
+
+Rewriting the $ATT$ in terms of conditional expectation: 
+
+  $$\hat{\delta}_{TC} = (E[Y_T | POST] - E[Y_T | PRE])-(E[Y_C | POST] - E[Y_C | PRE])$$
+
+--
+ 
+<br>
+We substitute the above with **switching equation** terms:
+
+  $$\hat{\delta}_{TC} = (E[Y^1_T | POST] - E[Y^0_T | PRE])-(E[Y^0_C | POST] - E[Y^0_C | PRE])$$
+
+--
+ 
+<br>
+and adding zero to the right-hand side:
+
+$$
+\begin{aligned}
+\hat{\delta}_{TC} = & \underbrace{(E[Y^1_T | POST] - E[Y^0_T | PRE])-(E[Y^0_C | POST] - E[Y^0_C | PRE])}_{\text{Switching Equation}} + \\
+                 & \underbrace{E[Y^0_T | POST] - E[Y^0_T | POST]}_{\text{Zero term}}
+\end{aligned}
+$$
+
+---
+# More formally, ...
+
+Re-arranging the terms: 
+
+$$
+\begin{aligned}
+\hat{\delta}_{TC} = & \underbrace{(E[Y^1_T | POST] - E[Y^0_T | POST])}_{ATT} + \\
+                 & \underbrace{(E[Y^0_T | POST] - E[Y^0_T | PRE]) - (E[Y^0_C | POST] - E[Y^0_C | PRE])}_{\text{Non-parallel trend bias}}
+\end{aligned}
+$$
+
+--
+
+.center[<img src='john_lennon_meme.PNG' width='250px' height='250px' style="position:absolute; left:625px; top:375px;">]
+
+
+--
+
+Imagine a world without your treatment: 
+
+* Would your $T$ and $C$ have evolved differently? 
+
+* If not, why?
+
+* Parallel trend assumption simply means your <br>
+your $T$ and $C$ would have moved similarly<br>
+in the absence of treatment. 
+
+---
+# The original design, revisited
+
+.pull-left[
+```{r lambeth_viz_revisited, ref.label='lambeth_viz', echo=FALSE}
+```
+]
+
+--
+
+.pull-right[
+```{r lambeth_viz_unparallel, dependson='lambeth_data_prep'}
+
+# defining a new tibble containing the unparallel data! 
+lambeth_counterfactual2 <- tribble(
+  ~company, ~period, ~cholera_incidence, ~group,
+  'L_C', 1, 85, 'Counterfactual',
+  'L_C', 2, 75, 'Counterfactual',
+) %>% 
+  mutate(period = factor(period, levels = c(1,2), labels = c('Before', 'After')))
+
+
+# drawing the graph
+ggplot(lambeth_actual, aes(x = period, y = cholera_incidence)) +
+  geom_point(data = lambeth_counterfactual2, size = 5, alpha = 2/3) +
+  geom_line(data = lambeth_counterfactual2, 
+            mapping = aes(group = group),
+            linetype = 'dashed') +
+  geom_point(data = lambeth_counterfactual, size = 3, alpha = 1/3) +
+  geom_line(data = lambeth_counterfactual, 
+            mapping = aes(group = group),
+            linetype = 'dotted') +
+  geom_point(aes(color = group), size = 5) + 
+  geom_line(aes(group = company, color = group)) +
+  geom_text(x = 2.3, y = 77, label = 'True Counterfactual') +
+  geom_text(x = 2.3, y = 97, label = 'Est. Counterfactual') +
+  theme_bw() +
+  ylab('Cholera incidence per 10,000 households') + 
+  xlab('Period') +
+  labs(title = "John Snow's cholera hypothesis, without parallel trends") +
+  geom_vline(xintercept = 1.5) +
+  geom_brace(aes(c(2.05,2.2), c(19, 72), label = '\U03B4 (ATT)'), 
+             inherit.data = F, rotate = 90, labelsize = 5) +
+  geom_brace(aes(c(1.8,1.95), c(19, 92), label = '\U03B4 (OLS)'), 
+             inherit.data = F, rotate = 270, labelsize = 5)
+```
+
+]
+
+---
+# Before we go...
+
+Please remember that **parallel trends** cannot really be verified.
+
+--
+
+Some basic DiD extensions: 
+
+--
+
+* Multiple pre- and post-treatment periods
+
+--
+
+* Event study difference-in-differences
+
+.center[<img src='es_employed_dummy.PNG' width='400px' height='300px' style="position:absolute; left:450px; top:340px;">]
+
+--
+
+* Staggered timing roll-out 
+
+--
+
+* Continuous treatment
+
