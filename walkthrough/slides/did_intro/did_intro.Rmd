@@ -340,7 +340,7 @@ Some basic DiD extensions:
 
 * Event study difference-in-differences
 
-.center[<img src='es_employed_dummy.PNG' width='400px' height='300px' style="position:absolute; left:450px; top:340px;">]
+.center[<img src='es_employed_dummy.png' width='400px' height='300px' style="position:absolute; left:450px; top:340px;">]
 
 --
 
