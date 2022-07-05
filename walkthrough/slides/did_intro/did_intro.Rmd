@@ -50,7 +50,7 @@ using data from 1849-1854.
 * Originally, water companies served Londoners using the downstream Thames water, which contained pollution
 via runoffs. 
 
-* However, in 1852, the parliament mandated a water company named Lambeth to move their water supply 
+* However, in 1852, the British parliament mandated a water company named Lambeth to move their water supply 
 upstream. This gave the company access to clean water sources.
 --
 
@@ -98,11 +98,22 @@ upstream. This gave the company access to clean water sources.
 
 * Meanwhile, the Southwark and Vauxhall water company is chosen as control group. 
 
-* Snow went to a great length to document the similarities between the two 
-companies. Sometimes their service would irregularly cut between neighbourhoods,
+* In diff-in-diff method, it is important that we select as controls groups that 
+tend to be most similar to the treated observations prior to the treatment. 
+
+* Snow went to a great length to document the similarities between Lambeth and Southwark-Vauxhall
+pre-1852. For example, he found that sometimes their service would irregularly cut between neighbourhoods,
 such that houses on either side were similar to each other.
 
-* The ATT would be -78 in the table.
+* Given these setup, differences-in-differences would allow us to identify the treatment effect by two steps.
+First, we calculate the pre-post differences for each of the water company. 
+Once that is done, we then calculate the difference between the two pre-post differences 
+of those water companies. 
+
+* The method is called difference-in-differences—literally, because we're 
+calculating those double differences. 
+
+* [EXPLAIN THE TABLE!] The ATT would be -78 in the table.
 --
 
  Let:
@@ -111,21 +122,23 @@ such that houses on either side were similar to each other.
     
 + **Southwark and Vauxhall** (*SV*) be the control group
 
-+ $C$ denote the Cholera incidence at each water company
++ $Cholera$ be the outcome of interest
 
-+ 1849 and 1854 denote pre-treatment $T_0$ and post-treatment $T_1$ period.
++ 1849 and 1854 denote pre-treatment $PRE$ and post-treatment $POST$ period.
 
 --
 
-Average treatment effect (ATT, to be precise) would be:
-
-  $$\hat{ATT} = (C_{L, T_1} - C_{L, T_0}) - (C_{SV, T_1} - C_{SV, T_0})$$
-
+$$
+\begin{aligned}
+\hat{TreatmentEffect} = & (Cholera_{L, POST} - Cholera_{L, PRE}) - \\
+                        & (Cholera_{SV, POST} - Cholera_{SV, PRE})
+\end{aligned}
+$$
 --
 
 ```{r lambeth_table}
 lambeth_table <- tribble(
-  ~Company,         ~`$T_0$`, ~`$T_1$`, ~Difference, 
+  ~Company,         ~Pre, ~Post, ~Difference, 
   'SV',             135,     147,    12,      
   'L',              85,      19,     -66, 
   '$L-SV$',         -50,    -128,    -78
@@ -138,6 +151,24 @@ kable(lambeth_table) %>%
 
 ---
 # The original design, visualized
+
+???
+* This graph visualizes the table in the previous slide.
+
+* Explain the legends and the graph layout. (The colors, the pre-post)
+
+* Notice the grey dot and the dotted patterns. 
+
+* Important DiD assumption: absent the treatment, 
+the treated group would have evolved similarly with the control group. 
+
+* Explain about the potential vs actual outcome; we don't really know 
+where the potential outcome is. But our assumption is that it co-moves
+with the control group.
+
+* ATT = actual outcome - assumed counterfactual
+--
+
 
 ```{r lambeth_data_prep, cache=TRUE}
 lambeth_table2 <- tribble(
@@ -179,74 +210,69 @@ ggplot(lambeth_actual, aes(x = period, y = cholera_incidence)) +
 ]
 
 ---
-# More formally, ...
+# Delving deeper
 
- Let: 
+???
+* We'll denote T and C as our treatment and control groups 
+
+* Post and pre- will denote the post- and pre-treatment periods 
+
+* Treatment of interest: TreatmentEffect. This can be calculated simply by 
+taking the double difference as before. 
+
+* Make the distinction between double difference and treatment effect. 
+Treatment effect is the truth we aim to strive for
+
+* However, it can be shown that DD is not always equal to TE. Explain about
+parallel-trends bias. 
+
+* Only if non-parallel trends bias = 0 can we be sure that DD = TE.
+--
+
+Let: 
 
 * $T$ and $C$ be treated and control groups.
 
 * $post$ and $pre$ denote post- and pre-treatment periods.
 
-We're interested in $\hat{\delta}_{TC}$—the ATT of $T$.
+We're interested in $\hat{TreatmentEffect}_{TC}$.
 
 --
 
-  $$\hat{\delta}_{TC} = (\bar{y}^{post}_{T} - \bar{y}^{pre}_{T}) - (\bar{y}^{post}_{C} - \bar{y}^{pre}_{C})$$
-
----
-# More formally, ...
-
-Rewriting the $ATT$ in terms of conditional expectation: 
-
-  $$\hat{\delta}_{TC} = (E[Y_T | POST] - E[Y_T | PRE])-(E[Y_C | POST] - E[Y_C | PRE])$$
-
---
- 
-<br>
-We substitute the above with **switching equation** terms:
-
-  $$\hat{\delta}_{TC} = (E[Y^1_T | POST] - E[Y^0_T | PRE])-(E[Y^0_C | POST] - E[Y^0_C | PRE])$$
-
---
- 
-<br>
-and adding zero to the right-hand side:
+Ideally,
 
 $$
 \begin{aligned}
-\hat{\delta}_{TC} = & \underbrace{(E[Y^1_T | POST] - E[Y^0_T | PRE])-(E[Y^0_C | POST] - E[Y^0_C | PRE])}_{\text{Switching Equation}} + \\
-                 & \underbrace{E[Y^0_T | POST] - E[Y^0_T | POST]}_{\text{Zero term}}
+TreatmentEffect_{TC} = & (Outcome^{post}_{T} - Outcome^{pre}_{T}) - \\
+                       & (Outcome^{post}_{C} - Outcome^{pre}_{C})
 \end{aligned}
 $$
+--
 
+But it can be shown that:
+
+  $$Change_{TC} = TreatmentEffect_{TC} + NonParallelTrendBias_{TC}$$
 ---
-# More formally, ...
+# Imagine...
 
-Re-arranging the terms: 
-
-$$
-\begin{aligned}
-\hat{\delta}_{TC} = & \underbrace{(E[Y^1_T | POST] - E[Y^0_T | POST])}_{ATT} + \\
-                 & \underbrace{(E[Y^0_T | POST] - E[Y^0_T | PRE]) - (E[Y^0_C | POST] - E[Y^0_C | PRE])}_{\text{Non-parallel trend bias}}
-\end{aligned}
-$$
+.center[<img src='john_lennon_meme.PNG' width='250px' height='250px' style="position:absolute; left:625px; top:250px;">]
 
 --
 
-.center[<img src='john_lennon_meme.PNG' width='250px' height='250px' style="position:absolute; left:625px; top:375px;">]
-
+Imagine a world without your treatment:
 
 --
 
-Imagine a world without your treatment: 
+* Would your $T$ and $C$ have evolved similarly?
 
-* Would your $T$ and $C$ have evolved differently? 
+--
 
 * If not, why?
 
+--
+
 * Parallel trend assumption simply means your <br>
-your $T$ and $C$ would have moved similarly<br>
-in the absence of treatment. 
+**your $T$ and $C$ would have moved similarly<br> in the absence of treatment**. 
 
 ---
 # The original design, revisited
@@ -272,11 +298,11 @@ lambeth_counterfactual2 <- tribble(
 
 # drawing the graph
 ggplot(lambeth_actual, aes(x = period, y = cholera_incidence)) +
-  geom_point(data = lambeth_counterfactual2, size = 5, alpha = 2/3) +
+  geom_point(data = lambeth_counterfactual2, size = 5, alpha = 1/3) +
   geom_line(data = lambeth_counterfactual2, 
             mapping = aes(group = group),
             linetype = 'dashed') +
-  geom_point(data = lambeth_counterfactual, size = 3, alpha = 1/3) +
+  geom_point(data = lambeth_counterfactual, size = 3, alpha = 2/3) +
   geom_line(data = lambeth_counterfactual, 
             mapping = aes(group = group),
             linetype = 'dotted') +

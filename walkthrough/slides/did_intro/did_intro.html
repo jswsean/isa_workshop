@@ -4,7 +4,7 @@
     <title>Introduction to Difference-in-differences</title>
     <meta charset="utf-8" />
     <meta name="author" content="Sean Hambali" />
-    <meta name="date" content="2022-06-30" />
+    <meta name="date" content="2022-07-05" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
@@ -22,7 +22,7 @@ class: center, middle, inverse, title-slide
 ### Sean Hambali
 ]
 .date[
-### 30 June 2022
+### 05 July 2022
 ]
 
 ---
@@ -62,7 +62,7 @@ using data from 1849-1854.
 * Originally, water companies served Londoners using the downstream Thames water, which contained pollution
 via runoffs. 
 
-* However, in 1852, the parliament mandated a water company named Lambeth to move their water supply 
+* However, in 1852, the British parliament mandated a water company named Lambeth to move their water supply 
 upstream. This gave the company access to clean water sources.
 --
 
@@ -110,11 +110,22 @@ upstream. This gave the company access to clean water sources.
 
 * Meanwhile, the Southwark and Vauxhall water company is chosen as control group. 
 
-* Snow went to a great length to document the similarities between the two 
-companies. Sometimes their service would irregularly cut between neighbourhoods,
+* In diff-in-diff method, it is important that we select as controls groups that 
+tend to be most similar to the treated observations prior to the treatment. 
+
+* Snow went to a great length to document the similarities between Lambeth and Southwark-Vauxhall
+pre-1852. For example, he found that sometimes their service would irregularly cut between neighbourhoods,
 such that houses on either side were similar to each other.
 
-* The ATT would be -78 in the table.
+* Given these setup, differences-in-differences would allow us to identify the treatment effect by two steps.
+First, we calculate the pre-post differences for each of the water company. 
+Once that is done, we then calculate the difference between the two pre-post differences 
+of those water companies. 
+
+* The method is called difference-in-differences—literally, because we're 
+calculating those double differences. 
+
+* [EXPLAIN THE TABLE!] The ATT would be -78 in the table.
 --
 
  Let:
@@ -123,24 +134,26 @@ such that houses on either side were similar to each other.
     
 + **Southwark and Vauxhall** (*SV*) be the control group
 
-+ `\(C\)` denote the Cholera incidence at each water company
++ `\(Cholera\)` be the outcome of interest
 
-+ 1849 and 1854 denote pre-treatment `\(T_0\)` and post-treatment `\(T_1\)` period.
++ 1849 and 1854 denote pre-treatment `\(PRE\)` and post-treatment `\(POST\)` period.
 
 --
 
-Average treatment effect (ATT, to be precise) would be:
-
-  `$$\hat{ATT} = (C_{L, T_1} - C_{L, T_0}) - (C_{SV, T_1} - C_{SV, T_0})$$`
-
+$$
+`\begin{aligned}
+\hat{TreatmentEffect} = &amp; (Cholera_{L, POST} - Cholera_{L, PRE}) - \\
+                        &amp; (Cholera_{SV, POST} - Cholera_{SV, PRE})
+\end{aligned}`
+$$
 --
 
 &lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
  &lt;thead&gt;
   &lt;tr&gt;
    &lt;th style="text-align:left;"&gt; Company &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; `\(T_0\)` &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; `\(T_1\)` &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pre &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Post &lt;/th&gt;
    &lt;th style="text-align:right;"&gt; Difference &lt;/th&gt;
   &lt;/tr&gt;
  &lt;/thead&gt;
@@ -169,6 +182,24 @@ Average treatment effect (ATT, to be precise) would be:
 ---
 # The original design, visualized
 
+???
+* This graph visualizes the table in the previous slide.
+
+* Explain the legends and the graph layout. (The colors, the pre-post)
+
+* Notice the grey dot and the dotted patterns. 
+
+* Important DiD assumption: absent the treatment, 
+the treated group would have evolved similarly with the control group. 
+
+* Explain about the potential vs actual outcome; we don't really know 
+where the potential outcome is. But our assumption is that it co-moves
+with the control group.
+
+* ATT = actual outcome - assumed counterfactual
+--
+
+
 
 
 .center[
@@ -176,74 +207,69 @@ Average treatment effect (ATT, to be precise) would be:
 ]
 
 ---
-# More formally, ...
+# Delving deeper
 
- Let: 
+???
+* We'll denote T and C as our treatment and control groups 
+
+* Post and pre- will denote the post- and pre-treatment periods 
+
+* Treatment of interest: TreatmentEffect. This can be calculated simply by 
+taking the double difference as before. 
+
+* Make the distinction between double difference and treatment effect. 
+Treatment effect is the truth we aim to strive for
+
+* However, it can be shown that DD is not always equal to TE. Explain about
+parallel-trends bias. 
+
+* Only if non-parallel trends bias = 0 can we be sure that DD = TE.
+--
+
+Let: 
 
 * `\(T\)` and `\(C\)` be treated and control groups.
 
 * `\(post\)` and `\(pre\)` denote post- and pre-treatment periods.
 
-We're interested in `\(\hat{\delta}_{TC}\)`—the ATT of `\(T\)`.
+We're interested in `\(\hat{TreatmentEffect}_{TC}\)`.
 
 --
 
-  `$$\hat{\delta}_{TC} = (\bar{y}^{post}_{T} - \bar{y}^{pre}_{T}) - (\bar{y}^{post}_{C} - \bar{y}^{pre}_{C})$$`
-
----
-# More formally, ...
-
-Rewriting the `\(ATT\)` in terms of conditional expectation: 
-
-  `$$\hat{\delta}_{TC} = (E[Y_T | POST] - E[Y_T | PRE])-(E[Y_C | POST] - E[Y_C | PRE])$$`
-
---
- 
-&lt;br&gt;
-We substitute the above with **switching equation** terms:
-
-  `$$\hat{\delta}_{TC} = (E[Y^1_T | POST] - E[Y^0_T | PRE])-(E[Y^0_C | POST] - E[Y^0_C | PRE])$$`
-
---
- 
-&lt;br&gt;
-and adding zero to the right-hand side:
+Ideally,
 
 $$
 `\begin{aligned}
-\hat{\delta}_{TC} = &amp; \underbrace{(E[Y^1_T | POST] - E[Y^0_T | PRE])-(E[Y^0_C | POST] - E[Y^0_C | PRE])}_{\text{Switching Equation}} + \\
-                 &amp; \underbrace{E[Y^0_T | POST] - E[Y^0_T | POST]}_{\text{Zero term}}
+TreatmentEffect_{TC} = &amp; (Outcome^{post}_{T} - Outcome^{pre}_{T}) - \\
+                       &amp; (Outcome^{post}_{C} - Outcome^{pre}_{C})
 \end{aligned}`
 $$
+--
 
+But it can be shown that:
+
+  `$$Change_{TC} = TreatmentEffect_{TC} + NonParallelTrendBias_{TC}$$`
 ---
-# More formally, ...
+# Imagine...
 
-Re-arranging the terms: 
-
-$$
-`\begin{aligned}
-\hat{\delta}_{TC} = &amp; \underbrace{(E[Y^1_T | POST] - E[Y^0_T | POST])}_{ATT} + \\
-                 &amp; \underbrace{(E[Y^0_T | POST] - E[Y^0_T | PRE]) - (E[Y^0_C | POST] - E[Y^0_C | PRE])}_{\text{Non-parallel trend bias}}
-\end{aligned}`
-$$
+.center[&lt;img src='john_lennon_meme.PNG' width='250px' height='250px' style="position:absolute; left:625px; top:250px;"&gt;]
 
 --
 
-.center[&lt;img src='john_lennon_meme.PNG' width='250px' height='250px' style="position:absolute; left:625px; top:375px;"&gt;]
-
+Imagine a world without your treatment:
 
 --
 
-Imagine a world without your treatment: 
+* Would your `\(T\)` and `\(C\)` have evolved similarly?
 
-* Would your `\(T\)` and `\(C\)` have evolved differently? 
+--
 
 * If not, why?
 
+--
+
 * Parallel trend assumption simply means your &lt;br&gt;
-your `\(T\)` and `\(C\)` would have moved similarly&lt;br&gt;
-in the absence of treatment. 
+**your `\(T\)` and `\(C\)` would have moved similarly&lt;br&gt; in the absence of treatment**. 
 
 ---
 # The original design, revisited
