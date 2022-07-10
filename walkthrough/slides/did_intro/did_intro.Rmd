@@ -44,7 +44,9 @@ and came out of the body, and passed into England's water supply.
 * In an ideal world, he would flip a coin, and assign people to drink from the contaminated Thames 
 water, and others to drink from the uncontaminated water. However, that would be costly and unfeasible. 
 
-* So he relied on a natural experiment. In his paper, he analyzes the prevalence of cholera 
+* So he relied on a natural experiment. Natural experiments are any types of experiments in which groups are exposed to the treatment to a varying degree, as determined by the nature. So it's not like an actual experiment sort of thing, in which it's you who's doing the randomization. In natural experiments, the nature does the work for all of us.
+
+* In his paper, he analyzes the prevalence of cholera 
 using data from 1849-1854. 
 
 * Originally, water companies served Londoners using the downstream Thames water, which contained pollution
