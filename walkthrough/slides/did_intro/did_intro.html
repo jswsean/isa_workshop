@@ -4,7 +4,7 @@
     <title>Introduction to Difference-in-differences</title>
     <meta charset="utf-8" />
     <meta name="author" content="Sean Hambali" />
-    <meta name="date" content="2022-07-05" />
+    <meta name="date" content="2022-07-10" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
@@ -22,7 +22,7 @@ class: center, middle, inverse, title-slide
 ### Sean Hambali
 ]
 .date[
-### 05 July 2022
+### 10 July 2022
 ]
 
 ---
@@ -56,7 +56,9 @@ and came out of the body, and passed into England's water supply.
 * In an ideal world, he would flip a coin, and assign people to drink from the contaminated Thames 
 water, and others to drink from the uncontaminated water. However, that would be costly and unfeasible. 
 
-* So he relied on a natural experiment. In his paper, he analyzes the prevalence of cholera 
+* So he relied on a natural experiment. Natural experiments are any types of experiments in which groups are exposed to the treatment to a varying degree, as determined by the nature. So it's not like an actual experiment sort of thing, in which it's you who's doing the randomization. In natural experiments, the nature does the work for all of us.
+
+* In his paper, he analyzes the prevalence of cholera 
 using data from 1849-1854. 
 
 * Originally, water companies served Londoners using the downstream Thames water, which contained pollution
@@ -117,6 +119,8 @@ tend to be most similar to the treated observations prior to the treatment.
 pre-1852. For example, he found that sometimes their service would irregularly cut between neighbourhoods,
 such that houses on either side were similar to each other.
 
+* [Explain `\(Cholera\)` and `\(PRE\)` or `\(POST\)` periods]
+
 * Given these setup, differences-in-differences would allow us to identify the treatment effect by two steps.
 First, we calculate the pre-post differences for each of the water company. 
 Once that is done, we then calculate the difference between the two pre-post differences 
@@ -142,7 +146,7 @@ calculating those double differences.
 
 $$
 `\begin{aligned}
-Change_{TC} = \hat{TreatmentEffect} = &amp; (Cholera_{L, POST} - Cholera_{L, PRE}) - \\
+\hat{TreatmentEffect} = &amp; (Cholera_{L, POST} - Cholera_{L, PRE}) - \\
                         &amp; (Cholera_{SV, POST} - Cholera_{SV, PRE})
 \end{aligned}`
 $$
@@ -240,17 +244,35 @@ Ideally,
 
 $$
 `\begin{aligned}
-TreatmentEffect_{TC} = &amp; (Outcome^{post}_{T} - Outcome^{pre}_{T}) - \\
-                       &amp; (Outcome^{post}_{C} - Outcome^{pre}_{C})
+DD_{TC}= TreatmentEffect_{TC} = &amp; (Outcome^{post}_{T} - Outcome^{pre}_{T}) - \\
+                                    &amp; (Outcome^{post}_{C} - Outcome^{pre}_{C})
 \end{aligned}`
 $$
 --
 
-But it can be shown that:
+But `\(DD_{TC}\)` doesn't always equal to `\(TreatmentEffect_{TC}\)`
 
-  `$$Change_{TC} = TreatmentEffect_{TC} + NonParallelTrendBias_{TC}$$`
+--
+
+It can be shown that:
+
+  `$$DD_{TC} = TreatmentEffect_{TC} + NonParallelTrendBias_{TC}$$`
 ---
 # Imagine...
+
+???
+* Try to imagine a world in which your treatment doesn't exist. But assume the control and treated groups still remain the same. 
+
+* Without your treatment, would those two groups still have evolved similarly? 
+
+* Say you and your sibling are experiencing a headache. Then, being social scientists, you think you wanna assess the effectiveness of Panadol in easing headaches. You then compare the pre- and post-outcomes of drinking Panadol. But would such comparisons provide good estimate of Panadol's treatment effect? 
+
+* The answer is no, if even without drinking Panadol, you or your sibling would have gotten better anyways.  
+
+* If you have reasons to believe that your treatment and control groups wouldn't have evolved similarly in the absence of treatment, it is important that you study the factors behind those divergences. Perhaps you could control them in your regressions?
+
+* [Explain about parallel trends assumption!]
+--
 
 .center[&lt;img src='john_lennon_meme.PNG' width='250px' height='250px' style="position:absolute; left:625px; top:250px;"&gt;]
 
@@ -274,6 +296,11 @@ Imagine a world without your treatment:
 ---
 # The original design, revisited
 
+???
+* [Walk through the graphs]
+
+--
+
 .pull-left[
 ![](did_intro_files/figure-html/lambeth_viz_revisited-1.png)&lt;!-- --&gt;
 ]
@@ -288,6 +315,14 @@ Imagine a world without your treatment:
 ---
 # Before we go...
 
+???
+* Parallel trends cannot really be verified because it requires us to have knowledge about two states of the world—one where your treatment exists, and another where it doesn't. So that kind of requires time travel, right? 
+
+* What's often done is including leads and lags in the model. This means you include the interaction between treatment group dummy and pre-treatment and post-treatment time periods. 
+
+* So basically you wanna know, whether there are significant difference in changes between treatment and control group before the treatment. This is different from studying whether the parallel trend actually holds!
+--
+
 Please remember that **parallel trends** cannot really be verified.
 
 --
@@ -296,17 +331,13 @@ Some basic DiD extensions:
 
 --
 
-* Multiple pre- and post-treatment periods
-
---
-
-* Event study difference-in-differences
+* Multiple pre- and post-treatment periods: event study difference-in-differences
 
 .center[&lt;img src='es_employed_dummy.png' width='400px' height='300px' style="position:absolute; left:450px; top:340px;"&gt;]
 
 --
 
-* Staggered timing roll-out 
+* Staggered treatment roll-out timing
 
 --
 

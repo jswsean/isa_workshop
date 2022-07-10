@@ -107,6 +107,8 @@ tend to be most similar to the treated observations prior to the treatment.
 pre-1852. For example, he found that sometimes their service would irregularly cut between neighbourhoods,
 such that houses on either side were similar to each other.
 
+* [Explain $Cholera$ and $PRE$ or $POST$ periods]
+
 * Given these setup, differences-in-differences would allow us to identify the treatment effect by two steps.
 First, we calculate the pre-post differences for each of the water company. 
 Once that is done, we then calculate the difference between the two pre-post differences 
@@ -132,7 +134,7 @@ calculating those double differences.
 
 $$
 \begin{aligned}
-Change_{TC} = \hat{TreatmentEffect} = & (Cholera_{L, POST} - Cholera_{L, PRE}) - \\
+\hat{TreatmentEffect} = & (Cholera_{L, POST} - Cholera_{L, PRE}) - \\
                         & (Cholera_{SV, POST} - Cholera_{SV, PRE})
 \end{aligned}
 $$
@@ -206,7 +208,10 @@ ggplot(lambeth_actual, aes(x = period, y = cholera_incidence)) +
   labs(title = "John Snow's cholera hypothesis") +
   geom_vline(xintercept = 1.5) +
   geom_brace(aes(c(2.05,2.2), c(19, 90), label = '\U03B4 (ATT)'), 
-             inherit.data = F, rotate = 90, labelsize = 5)
+             inherit.data = F, rotate = 90, labelsize = 5) +
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14),
+        title = element_text(size = 16))
 
 ```
 ]
@@ -245,17 +250,35 @@ Ideally,
 
 $$
 \begin{aligned}
-TreatmentEffect_{TC} = & (Outcome^{post}_{T} - Outcome^{pre}_{T}) - \\
-                       & (Outcome^{post}_{C} - Outcome^{pre}_{C})
+DD_{TC}= TreatmentEffect_{TC} = & (Outcome^{post}_{T} - Outcome^{pre}_{T}) - \\
+                                    & (Outcome^{post}_{C} - Outcome^{pre}_{C})
 \end{aligned}
 $$
 --
 
-But it can be shown that:
+But $DD_{TC}$ doesn't always equal to $TreatmentEffect_{TC}$
 
-  $$Change_{TC} = TreatmentEffect_{TC} + NonParallelTrendBias_{TC}$$
+--
+
+It can be shown that:
+
+  $$DD_{TC} = TreatmentEffect_{TC} + NonParallelTrendBias_{TC}$$
 ---
 # Imagine...
+
+???
+* Try to imagine a world in which your treatment doesn't exist. But assume the control and treated groups still remain the same. 
+
+* Without your treatment, would those two groups still have evolved similarly? 
+
+* Say you and your sibling are experiencing a headache. Then, being social scientists, you think you wanna assess the effectiveness of Panadol in easing headaches. You then compare the pre- and post-outcomes of drinking Panadol. But would such comparisons provide good estimate of Panadol's treatment effect? 
+
+* The answer is no, if even without drinking Panadol, you or your sibling would have gotten better anyways.  
+
+* If you have reasons to believe that your treatment and control groups wouldn't have evolved similarly in the absence of treatment, it is important that you study the factors behind those divergences. Perhaps you could control them in your regressions?
+
+* [Explain about parallel trends assumption!]
+--
 
 .center[<img src='john_lennon_meme.PNG' width='250px' height='250px' style="position:absolute; left:625px; top:250px;">]
 
@@ -279,16 +302,20 @@ Imagine a world without your treatment:
 ---
 # The original design, revisited
 
+???
+* [Walk through the graphs]
+
+--
+
 .pull-left[
-```{r lambeth_viz_revisited, ref.label='lambeth_viz', echo=FALSE}
+```{r lambeth_viz_revisited, ref.label='lambeth_viz', echo=FALSE, fig.height=9.5, fig.width=8}
 ```
 ]
 
 --
 
 .pull-right[
-```{r lambeth_viz_unparallel, dependson='lambeth_data_prep'}
-
+```{r lambeth_viz_unparallel, dependson='lambeth_data_prep', fig.height=9.5, fig.width=8}
 # defining a new tibble containing the unparallel data! 
 lambeth_counterfactual2 <- tribble(
   ~company, ~period, ~cholera_incidence, ~group,
@@ -320,13 +347,24 @@ ggplot(lambeth_actual, aes(x = period, y = cholera_incidence)) +
   geom_brace(aes(c(2.05,2.2), c(19, 72), label = '\U03B4 (ATT)'), 
              inherit.data = F, rotate = 90, labelsize = 5) +
   geom_brace(aes(c(1.8,1.95), c(19, 92), label = '\U03B4 (OLS)'), 
-             inherit.data = F, rotate = 270, labelsize = 5)
+             inherit.data = F, rotate = 270, labelsize = 5) +
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14),
+        title = element_text(size = 16))
 ```
 
 ]
 
 ---
 # Before we go...
+
+???
+* Parallel trends cannot really be verified because it requires us to have knowledge about two states of the world—one where your treatment exists, and another where it doesn't. So that kind of requires time travel, right? 
+
+* What's often done is including leads and lags in the model. This means you include the interaction between treatment group dummy and pre-treatment and post-treatment time periods. 
+
+* So basically you wanna know, whether there are significant difference in changes between treatment and control group before the treatment. This is different from studying whether the parallel trend actually holds!
+--
 
 Please remember that **parallel trends** cannot really be verified.
 
@@ -336,17 +374,13 @@ Some basic DiD extensions:
 
 --
 
-* Multiple pre- and post-treatment periods
-
---
-
-* Event study difference-in-differences
+* Multiple pre- and post-treatment periods: event study difference-in-differences
 
 .center[<img src='es_employed_dummy.png' width='400px' height='300px' style="position:absolute; left:450px; top:340px;">]
 
 --
 
-* Staggered timing roll-out 
+* Staggered treatment roll-out timing
 
 --
 
