@@ -74,16 +74,47 @@ library(stargazer)
 library(fixest)
 ```
 
+# Outline
+
+???
+* Introduction: a brief summary of the paper's key points and results
+
+* Data: Data used for the paper's analysis, and when u can find the dataset
+
+* Methodology: key institutional feature, identification strategy, estimation methods 
+
+* Results: main results, robustness checks, and effect mechanisms 
+
+* Conclusion: summarizing the paper findings
+--
+
+* Introduction: the paper in brief
+
+* Data
+
+* Methodology
+
+* Results
+
+* Conclusion
+
+---
+
 # What motivated the paper?
 
+???
 * There have been massive increases in school enrollment and educational attainment 
 among developing countries in the last decades
 
-<img src="indo_students.JPG" style="position:absolute; right:0; top:500px;">
+* Little has been discussed about its effects on the quality of local governance
+
+* MB looks at how an Indonesian large-scale school construction program back in 1974 has affected the quality of village governance and the provisions of public goods.
 
 --
 
-* How would this affect local governance?
+* How would increases in educational attainment affect local governance?
+
+<img src="indo_students.JPG" style="position:absolute; right:0; top:500px;">
 
 --
 
@@ -92,6 +123,16 @@ in Indonesia (the INPRES program) on **village governance and public good provis
 
 ---
 # The author's hypothesis
+
+???
+* The author's hypothesis is that INPRES school construction program will increase the educational attainment of village heads
+
+* Better educated village heads will be able to better relocate their village budgets towards more productive budget posts, such as infrastructure constructions 
+
+* They will also be more efficient at project management
+
+* Taken together, this will imply that the village government will have better provision of public goods
+--
 
 ```{r theory_of_change}
 DiagrammeR::grViz(" digraph {
@@ -117,6 +158,16 @@ DiagrammeR::grViz(" digraph {
 
 # How the author does it 
 
+???
+* Case study of multi pre- and post-treatment periods, and staggered treatment timing.
+
+* [On the treatment]: because INPRES program started on 1974, and village head candidates must be at least 25 years old, so the first time that INPRES cohorts will be able to run for office will be in 1992. So, the first year that a village runs its post-1992 election will be regarded as its first post-treatment period.
+
+* I will be referring to the INPRES-cohort election as our treatment variable.
+
+* [On the DiD strategy]: MB used DID to analyze impacts on village-level outcomes by making two types of comparisons: (1) The first comparison is made for each villages before and after they run the INPRES-cohort elections; and (2) the second comparison is made between-villages, among those who had run their first INPRES-cohort elections and those who had not.
+--
+
 * **Key institutional feature**: 
 
     + INPRES program started in 1974
@@ -134,16 +185,21 @@ could run as village head candidates
 
 --
 
-* MB used DiD strategy to compare village-level outcomes among:
+* MB used DiD strategy to compare village-level outcomes:
   
 --
   
-    + Villages before and after the INPRES cohorts could run as candidates 
+    + Before-after INPRES-cohort elections
 --
-    + Villages that had run their first INPRES cohort elections and those that had not
+    + Those with-without INPRES-cohort elections 
     
 ---
 # What's the result?
+
+???
+* Heterogenous effects across villages as a function of their demand for public goods: election impacts are stronger in villages with worse public good provision at baseline, where we'd expect to see higher demand for public goods
+
+--
 
 * First election to which the newly educated cohorts could run as candidates 
 led to **increases in provision of key public goods**:
@@ -151,9 +207,7 @@ led to **increases in provision of key public goods**:
 --
 
     + Number of doctors
---
     + Presence of primary health care centers
---
     + Access to basic services, i.e., safe drinking water and garbage disposal
 --
 
@@ -177,6 +231,12 @@ led to **increases in provision of key public goods**:
 
 ---
 # Data
+
+???
+* MB only focused on Java as BPS often used inconsistent village code identifiers back in 1990s. 
+
+* As such, the whole merging thing has to be done on **names**, not village codes. This makes the whole thing messy.  
+--
 
 <img src="indo_students.JPG" style="position:absolute; right:0; top:500px;">
 
@@ -980,6 +1040,12 @@ $$
 ---
 # .medsmall[Results: What are the effect's mechanisms?]
 
+???
+* Equilibrium effect: Entry of new candidates could shift the broader electoral preference towards more educated candidates. This could happen in elections where even INPRES-cohorts didn't run as candidates in the election
+
+* The two channels are explored by columns 5 and 6 in the Output panel. 
+--
+
 * **How could the influx of educated candidates influence public good provision?**
 
 --
@@ -1085,6 +1151,10 @@ $$
 
 ---
 # .medsmall[Results: What are the effect's mechanisms?]
+
+???
+* The 2SLS specification uses as instrument the average education of the village head in neighboring villages. 
+--
 
 * **How does increased VH education affect public goods provision?**
 
